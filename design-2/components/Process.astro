@@ -1,0 +1,72 @@
+---
+import { process } from '../../src/data/site';
+---
+
+<section id="process" class="block" aria-labelledby="process-label">
+  <div class="col">
+    <h2 id="process-label" class="kicker">{process.label}</h2>
+    <p class="lede">{process.intro}</p>
+
+    <ol class="steps">
+      {
+        process.steps.map((step, i) => (
+          <li data-reveal style={`--d:${i}`}>
+            <span class="num" aria-hidden="true">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <h3>{step.title}</h3>
+            <p>{step.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <a class="btn btn-soft" href={process.cta.href}>
+      {process.cta.label} <span class="arrow" aria-hidden="true">→</span>
+    </a>
+  </div>
+</section>
+
+<style>
+  .lede {
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+    margin-block: 24px 26px;
+  }
+
+  .num {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+  }
+
+  h3 {
+    margin-top: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+  }
+
+  .steps p {
+    margin-top: 10px;
+    font-size: 13.2px;
+    line-height: 1.7;
+    color: var(--ink-soft);
+  }
+
+  @media (max-width: 600px) {
+    .steps {
+      grid-template-columns: 1fr;
+      gap: 26px;
+    }
+  }
+</style>

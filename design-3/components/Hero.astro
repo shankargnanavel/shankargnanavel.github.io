@@ -1,0 +1,419 @@
+---
+import { Image } from 'astro:assets';
+import { resume, site, spec } from '../../src/data/site';
+import { firstImage } from '../../src/lib/images';
+
+const portrait = firstImage('profile/portrait-cutout.png', 'profile/portrait.png');
+const current = resume.experience[0];
+const { verb, focus, tail, emphasis } = spec.headline;
+
+// The "inspector" beside the headline lists a few properties, as a design tool would.
+const properties = [
+  { key: 'Role', value: site.role },
+  { key: 'Now', value: current.short },
+  { key: 'Based', value: site.location },
+  { key: 'Experience', value: '10+ years' },
+];
+---
+
+<section id="top" class="hero" data-section="top" aria-labelledby="hero-title">
+  <div class="rings" aria-hidden="true"></div>
+
+  <div class="wrap layout">
+    <div class="copy">
+      <p class="surface mono" aria-hidden="true"><i></i>#F8F9FA · surface</p>
+
+      <h1 id="hero-title">
+        <span class="who">{site.shortName}</span>
+        <span class="row">
+          <span class="grey">{verb}</span>
+          <span class="select" data-measure>
+            {focus}
+            <i class="handle tl" aria-hidden="true"></i><i class="handle tr" aria-hidden="true"></i><i
+              class="handle bl"
+              aria-hidden="true"></i><i class="handle br" aria-hidden="true"></i>
+            <span class="size mono" data-measure-label aria-hidden="true">430 × 72</span>
+          </span>
+        </span>
+        <span class="row">
+          <span class="grey">{tail}</span>
+          <span class="serif mark">{emphasis}</span>
+        </span>
+      </h1>
+
+      <p class="sub">{spec.sub}</p>
+
+      <!-- A measurement mark: the gap below really is 32px. -->
+      <div class="gap" aria-hidden="true"><span class="mono">32</span></div>
+
+      <div class="actions">
+        <a class="pill pill-primary" href="#work">
+          See the work <span class="arrow" aria-hidden="true">→</span>
+        </a>
+        {
+          site.resumePdf && (
+            <a class="text-link" href={site.resumePdf} target="_blank" rel="noopener">
+              or read the resume <span class="arrow" aria-hidden="true">→</span>
+              <span class="sr-only">(PDF, opens in a new tab)</span>
+            </a>
+          )
+        }
+      </div>
+    </div>
+
+    <aside class="inspector" aria-label="About me, at a glance">
+      <p class="inspector-title mono">
+        <span>Inspector</span>
+        <span>portrait.png</span>
+      </p>
+      {
+        portrait && (
+          <div class="photo">
+            <Image
+              src={portrait}
+              alt={`Portrait of ${site.name}`}
+              width={500}
+              widths={[280, 500]}
+              sizes="260px"
+              format="webp"
+              loading="eager"
+              fetchpriority="high"
+            />
+            <i class="handle tl" aria-hidden="true" /><i class="handle tr" aria-hidden="true" /><i class="handle bl" aria-hidden="true" /><i
+              class="handle br"
+              aria-hidden="true"
+            />
+          </div>
+        )
+      }
+      <dl class="props">
+        {
+          properties.map((property) => (
+            <div>
+              <dt class="mono">{property.key}</dt>
+              <dd>{property.value}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </aside>
+  </div>
+
+  <div class="wrap status mono" aria-hidden="true">
+    <span class="online">{site.location}</span>
+    <span data-coords>x 0   y 0</span>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    align-content: center;
+    min-height: 100svh;
+    padding-block: 132px 76px;
+    overflow: hidden;
+  }
+
+  /* Faint concentric rings, like a target behind the page. */
+  .rings {
+    position: absolute;
+    left: 50%;
+    top: -30%;
+    width: 1500px;
+    aspect-ratio: 1;
+    translate: -50% 0;
+    z-index: -1;
+    border-radius: 50%;
+    background: repeating-radial-gradient(circle, transparent 0 118px, rgba(31, 31, 31, 0.045) 118px 119px);
+    -webkit-mask-image: radial-gradient(circle, #000 20%, transparent 68%);
+    mask-image: radial-gradient(circle, #000 20%, transparent 68%);
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 330px;
+    align-items: center;
+    gap: clamp(32px, 6vw, 96px);
+  }
+
+  .surface {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 26px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
+  .surface i {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    border: 1px solid var(--line-strong);
+    background: var(--bg);
+  }
+
+  h1 {
+    display: grid;
+    gap: 0.06em;
+    font-size: clamp(38px, 5.1vw, 62px);
+    font-weight: 600;
+    line-height: 1.08;
+    letter-spacing: -0.035em;
+  }
+
+  .who {
+    justify-self: start;
+    border-bottom: 2px dotted var(--blue);
+    padding-bottom: 0.02em;
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 0.25em;
+  }
+
+  .grey {
+    color: var(--ink-soft);
+  }
+
+  /* The phrase is "selected", with handles and its real size. */
+  .select {
+    position: relative;
+    padding: 0 0.08em;
+    outline: 1.5px solid var(--blue);
+    outline-offset: -1px;
+    background: rgba(var(--blue-rgb), 0.06);
+  }
+
+  .handle {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    border: 1.5px solid var(--blue);
+    background: #fff;
+  }
+
+  .tl {
+    top: -5px;
+    left: -5px;
+  }
+  .tr {
+    top: -5px;
+    right: -5px;
+  }
+  .bl {
+    bottom: -5px;
+    left: -5px;
+  }
+  .br {
+    bottom: -5px;
+    right: -5px;
+  }
+
+  .size {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    padding: 4px 7px;
+    border-radius: 4px;
+    background: var(--blue);
+    color: #fff;
+    font-size: 11px;
+    line-height: 1.2;
+    letter-spacing: 0;
+    white-space: nowrap;
+  }
+
+  .mark {
+    padding-right: 0.06em;
+    background: linear-gradient(var(--yellow), var(--yellow)) 0 78% / 100% 46% no-repeat;
+  }
+
+  .sub {
+    max-width: 44ch;
+    margin-top: 30px;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    text-wrap: pretty;
+  }
+
+  .gap {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    height: 32px;
+    color: var(--red);
+  }
+
+  .gap::before {
+    content: '';
+    width: 9px;
+    height: 100%;
+    border-block: 1px solid currentColor;
+    background: linear-gradient(currentColor, currentColor) 50% 0 / 1px 100% no-repeat;
+  }
+
+  .gap .mono {
+    font-size: 12px;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 22px;
+  }
+
+  .text-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 44px;
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--blue);
+  }
+
+  .text-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  /* Inspector panel */
+  .inspector {
+    justify-self: end;
+    width: min(100%, 330px);
+    padding: 16px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--line);
+    background: var(--surface);
+    box-shadow: 0 30px 60px -40px rgba(31, 31, 31, 0.35);
+  }
+
+  .inspector-title {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 4px 14px;
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+
+  .photo {
+    position: relative;
+    display: grid;
+    place-items: end center;
+    aspect-ratio: 1 / 0.92;
+    outline: 1.5px solid var(--blue);
+    background:
+      radial-gradient(circle at 50% 62%, var(--blue-soft) 0 44%, transparent 44.5%),
+      var(--surface-2);
+  }
+
+  .photo :global(img) {
+    width: 84%;
+  }
+
+  .props {
+    display: grid;
+    margin-top: 14px;
+  }
+
+  .props div {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 4px;
+    border-top: 1px solid var(--line);
+  }
+
+  .props dt {
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+
+  .props dd {
+    font-size: 14px;
+    font-weight: 600;
+    text-align: right;
+  }
+
+  .status {
+    position: absolute;
+    left: 50%;
+    bottom: 22px;
+    translate: -50% 0;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+
+  .online::before {
+    content: '';
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-right: 9px;
+    border-radius: 50%;
+    background: #34a853;
+  }
+
+  /* Load-in */
+  .copy > *,
+  .inspector {
+    animation: rise 0.8s var(--ease-out) both;
+  }
+
+  .copy > h1 {
+    animation-delay: 0.06s;
+  }
+  .copy > .sub {
+    animation-delay: 0.14s;
+  }
+  .copy > .gap,
+  .copy > .actions {
+    animation-delay: 0.2s;
+  }
+  .inspector {
+    animation-delay: 0.26s;
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+  }
+
+  @media (max-width: 900px) {
+    .hero {
+      min-height: 0;
+      padding-block: 116px 72px;
+    }
+
+    .layout {
+      grid-template-columns: 1fr;
+    }
+
+    .inspector {
+      justify-self: start;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .size {
+      display: none;
+    }
+  }
+</style>

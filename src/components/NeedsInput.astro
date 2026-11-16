@@ -1,0 +1,18 @@
+---
+/**
+ * A reminder that content is missing. It shows only while you run
+ * `npm run dev`; the published site never renders it.
+ */
+interface Props {
+  note: string;
+}
+const { note } = Astro.props;
+---
+
+{
+  import.meta.env.DEV && (
+    <aside class="needs-input" role="note">
+      <strong>[NEEDS INPUT]</strong> {note}
+    </aside>
+  )
+}

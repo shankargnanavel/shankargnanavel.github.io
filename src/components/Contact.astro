@@ -1,0 +1,230 @@
+---
+import { Image } from 'astro:assets';
+import ContactPills from './ContactPills.astro';
+import Icon from './Icon.astro';
+import NeedsInput from './NeedsInput.astro';
+import { contact, site } from '../data/site';
+import { findImage } from '../lib/images';
+
+const answered = contact.faq.filter((item) => item.a.trim());
+const unanswered = contact.faq.filter((item) => !item.a.trim());
+const avatar = findImage('profile/avatar.jpg');
+---
+
+<section id="contact" class="section" data-section="contact" aria-labelledby="contact-title">
+  <div class="wrap">
+    <div class="section-head" data-reveal>
+      <h2 id="contact-title" class="h-mono">{contact.heading}</h2>
+      <p class="lede">{contact.subtitle}</p>
+      <div class="pills"><ContactPills /></div>
+      <p class="fineprint">
+        Or write to <a class="email" href={`mailto:${site.email}`}>{site.email}</a>
+      </p>
+    </div>
+
+    <div class="layout">
+      <div class="faq" data-reveal>
+        <h3 class="sr-only">Questions I get asked</h3>
+        {
+          answered.map((item) => (
+            <details>
+              <summary>
+                <span class="q">{item.q}</span>
+                <span class="plus" aria-hidden="true">
+                  <Icon name="plus" size={16} />
+                </span>
+              </summary>
+              <p class="a">{item.a}</p>
+            </details>
+          ))
+        }
+        {
+          unanswered.length > 0 && (
+            <NeedsInput
+              note={`${unanswered.length} FAQ answers are empty and hidden: ${unanswered.map((item) => `"${item.q}"`).join(', ')}. Fill them in src/data/site.ts.`}
+            />
+          )
+        }
+      </div>
+
+      <aside class="card" data-reveal style="--d:1" aria-label="Contact details">
+        {
+          avatar && (
+            <div class="photo">
+              <Image src={avatar} alt="" widths={[240, 480]} sizes="220px" format="webp" />
+            </div>
+          )
+        }
+        <p class="name">{site.name}</p>
+        <p class="role">{site.role}</p>
+        <p class="where"><Icon name="pin" size={14} />{site.location}</p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pills {
+    margin-top: 28px;
+  }
+
+  .email {
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 255, 255, 0.4);
+    text-underline-offset: 3px;
+    transition:
+      color 0.2s var(--ease),
+      text-decoration-color 0.2s var(--ease);
+  }
+
+  .email:hover {
+    color: var(--accent);
+    text-decoration-color: var(--accent);
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    align-items: start;
+    gap: clamp(32px, 7vw, 96px);
+    max-width: 940px;
+    margin: clamp(48px, 7vw, 80px) auto 0;
+  }
+
+  /* FAQ as a chat: questions are bubbles, answers are replies. */
+  .faq {
+    display: grid;
+    gap: 12px;
+  }
+
+  summary {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    list-style: none;
+    cursor: pointer;
+    border-radius: 24px;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .q {
+    padding: 12px 18px;
+    border-radius: 22px 22px 22px 6px;
+    background: var(--surface);
+    line-height: 1.45;
+    transition: background-color 0.25s var(--ease);
+  }
+
+  summary:hover .q {
+    background: var(--surface-3);
+  }
+
+  .plus {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--line-strong);
+    color: var(--muted);
+    transition:
+      transform 0.35s var(--ease-out),
+      background-color 0.25s var(--ease),
+      color 0.25s var(--ease),
+      border-color 0.25s var(--ease);
+  }
+
+  summary:hover .plus {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  details[open] .plus {
+    transform: rotate(45deg);
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .a {
+    max-width: 60ch;
+    margin: 10px 0 8px 28px;
+    padding: 14px 18px;
+    border-radius: 22px 22px 6px 22px;
+    background: var(--accent-soft);
+    border: 1px solid rgba(var(--accent-rgb), 0.22);
+    font-size: 15px;
+    line-height: 1.6;
+    animation: reply 0.45s var(--ease-out);
+  }
+
+  @keyframes reply {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+  }
+
+  /* Contact card with a duotone portrait. */
+  .card {
+    text-align: center;
+  }
+
+  .photo {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--accent);
+    rotate: 2deg;
+    transition: rotate 0.5s var(--ease-out);
+  }
+
+  .card:hover .photo {
+    rotate: 0deg;
+  }
+
+  .photo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 15%;
+    filter: grayscale(1) contrast(1.2);
+    mix-blend-mode: multiply;
+  }
+
+  .name {
+    margin-top: 18px;
+    font-weight: 600;
+  }
+
+  .role {
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .where {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--dim);
+  }
+
+  @media (max-width: 820px) {
+    .layout {
+      grid-template-columns: 1fr;
+    }
+
+    .card {
+      max-width: 220px;
+      margin-inline: auto;
+    }
+  }
+</style>

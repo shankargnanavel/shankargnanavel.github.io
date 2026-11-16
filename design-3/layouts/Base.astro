@@ -1,0 +1,140 @@
+---
+import '@fontsource-variable/inter/wght.css';
+import '@fontsource-variable/jetbrains-mono/wght.css';
+import '@fontsource/libre-baskerville/400-italic.css';
+import '../styles/global.css';
+import interFont from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import serifFont from '@fontsource/libre-baskerville/files/libre-baskerville-latin-400-italic.woff2?url';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../../src/data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Case-study pages show "Back to home" in the header instead of the section links. */
+  back?: boolean;
+}
+
+const { title = site.title, description = site.description, back = false } = Astro.props;
+const canonical = site.url ? new URL(Astro.url.pathname, site.url).href : undefined;
+const ogImage = site.url ? new URL('/og-3.png', site.url).href : '/og-3.png';
+---
+
+<!doctype html>
+<html lang="en-GB" class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={site.name} />
+    <meta name="theme-color" content="#f8f9fa" />
+    {canonical && <link rel="canonical" href={canonical} />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon-3.svg" />
+    <link rel="preload" href={interFont} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={serifFont} as="font" type="font/woff2" crossorigin />
+
+    <!-- Apply the saved motion choice before the first paint, and animate only once scripts run. -->
+    <script is:inline>
+      (function (d) {
+        try {
+          if (localStorage.getItem('motion') === 'off') d.dataset.motion = 'off';
+        } catch (e) {}
+        d.classList.replace('no-js', 'js');
+        setTimeout(function () {
+          if (!window.__siteReady) d.classList.remove('js');
+        }, 3500);
+      })(document.documentElement);
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <Header back={back} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+
+    <!-- The layout grid, shown by the grid button in the header. -->
+    <div class="grid-overlay" aria-hidden="true">
+      <div class="wrap">
+        {Array.from({ length: 12 }, () => <span />)}
+      </div>
+      <p class="grid-note">12 columns · 24 gutter · 1216 wide</p>
+    </div>
+
+    <script>
+      import '../scripts/site.ts';
+    </script>
+  </body>
+</html>
+
+<style>
+  .grid-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s var(--ease);
+  }
+
+  :global(html[data-grid='on']) .grid-overlay {
+    opacity: 1;
+  }
+
+  .grid-overlay .wrap {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 24px;
+    height: 100%;
+  }
+
+  .grid-overlay span {
+    background: rgba(var(--blue-rgb), 0.07);
+    border-inline: 1px solid rgba(var(--blue-rgb), 0.22);
+  }
+
+  .grid-note {
+    position: absolute;
+    left: 50%;
+    bottom: 18px;
+    translate: -50% 0;
+    padding: 7px 12px;
+    border-radius: 6px;
+    background: var(--blue);
+    color: #fff;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 760px) {
+    .grid-overlay .wrap {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .grid-overlay span:nth-child(n + 5) {
+      display: none;
+    }
+  }
+
+  @media print {
+    .grid-overlay {
+      display: none;
+    }
+  }
+</style>

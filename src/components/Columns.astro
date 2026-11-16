@@ -1,0 +1,35 @@
+---
+/** Two blocks side by side on wide screens, stacked on small ones. Used inside case studies. */
+---
+
+<div class="columns"><slot /></div>
+
+<style>
+  .columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-block: 28px;
+  }
+
+  .columns > :global(div) {
+    padding: 22px 24px 24px;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .columns > :global(div > :first-child) {
+    margin-top: 0;
+  }
+
+  .columns > :global(div > :last-child) {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 700px) {
+    .columns {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

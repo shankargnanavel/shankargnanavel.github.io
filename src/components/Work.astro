@@ -1,0 +1,47 @@
+---
+import ProjectCard from './ProjectCard.astro';
+import { work } from '../data/site';
+import { caseStudies as projects } from '../data/projects';
+---
+
+<section id="work" class="section" data-section="work" aria-labelledby="work-title">
+  <div class="wrap">
+    <div class="section-head" data-reveal>
+      <h2 id="work-title" class="h-mono">{work.heading}</h2>
+      <p class="lede">{work.subtitle}</p>
+      {work.note && <p class="fineprint">{work.note}</p>}
+    </div>
+
+    <ul class="grid">
+      {
+        projects.map((project, i) => (
+          <li data-reveal style={`--d:${i}`}>
+            <ProjectCard project={project} />
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: clamp(36px, 5vw, 56px);
+  }
+
+  @media (max-width: 960px) {
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+  }
+</style>

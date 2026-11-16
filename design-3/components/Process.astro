@@ -1,0 +1,339 @@
+---
+import { process, spec } from '../../src/data/site';
+---
+
+<section id="process" class="section" data-section="process" aria-labelledby="process-title">
+  <div class="wrap">
+    <div class="head" data-reveal>
+      <div>
+        <p class="eyebrow">{spec.process.eyebrow}</p>
+        <h2 id="process-title" class="title">{spec.process.title} <span class="serif">{spec.process.emphasis}</span></h2>
+      </div>
+      <p class="head-intro">{process.intro}</p>
+    </div>
+
+    <ol class="steps">
+      {
+        process.steps.map((step, i) => (
+          <li class="step" data-reveal>
+            <div class="copy">
+              <p class="num serif" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
+              </p>
+              <h3>{step.title}</h3>
+              <p class="text">{step.text}</p>
+            </div>
+
+            {/* A small diagram for each step, drawn in CSS. */}
+            <div class="panel" aria-hidden="true">
+              {i === 0 && (
+                <div class="diagram flow">
+                  <span class="cap">AS-IS flow</span>
+                  <div class="nodes">
+                    <i />
+                    <i />
+                    <i class="issue" />
+                    <i />
+                    <i />
+                  </div>
+                  <span class="note red">usability issue</span>
+                </div>
+              )}
+              {i === 1 && (
+                <div class="diagram pair">
+                  <div class="card">
+                    <span class="cap">User interviews</span>
+                    <b>Expectations</b>
+                    <b>Behaviours</b>
+                    <b>Challenges</b>
+                  </div>
+                  <span class="to">→</span>
+                  <div class="card solved">
+                    <span class="cap">TO-BE flow</span>
+                    <div class="nodes">
+                      <i />
+                      <i />
+                      <i />
+                    </div>
+                    <span class="note green">a solution for each</span>
+                  </div>
+                </div>
+              )}
+              {i === 2 && (
+                <div class="diagram options">
+                  <div class="option">A</div>
+                  <div class="option picked">
+                    B<span class="tick">preferred</span>
+                  </div>
+                  <div class="option">C</div>
+                  <span class="cap wide">3 approaches tested · 1 taken forward</span>
+                </div>
+              )}
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+
+    <p class="more" data-reveal>
+      <a class="pill" href={process.cta.href}>
+        {process.cta.label} <span class="arrow">→</span>
+      </a>
+    </p>
+  </div>
+</section>
+
+<style>
+  .steps {
+    border-top: 1px solid var(--ink);
+  }
+
+  .step {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    align-items: center;
+    gap: clamp(28px, 6vw, 96px);
+    padding-block: clamp(36px, 5vw, 64px);
+    border-bottom: 1px solid var(--ink);
+    transition:
+      opacity 0.7s var(--ease-out),
+      transform 0.7s var(--ease-out);
+  }
+
+  /* Alternate sides, as in the reference. */
+  .step:nth-child(even) .copy {
+    order: 2;
+  }
+
+  .num {
+    font-size: clamp(84px, 10vw, 130px);
+    line-height: 0.85;
+    letter-spacing: -0.05em;
+  }
+
+  h3 {
+    max-width: 16ch;
+    margin-top: 22px;
+    font-size: clamp(26px, 2.8vw, 34px);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+
+  .text {
+    max-width: 42ch;
+    margin-top: 12px;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+  }
+
+  .panel {
+    display: grid;
+    place-items: center;
+    min-height: 250px;
+    padding: 28px;
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    transition: background-color 0.3s var(--ease);
+  }
+
+  .step:hover .panel {
+    background: var(--surface-3);
+  }
+
+  .diagram {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-faint);
+  }
+
+  .cap {
+    display: block;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .nodes {
+    display: flex;
+    align-items: center;
+    margin-block: 14px;
+  }
+
+  .nodes i {
+    position: relative;
+    width: 38px;
+    height: 26px;
+    margin-right: 22px;
+    border-radius: 7px;
+    border: 1.5px solid var(--ink);
+    background: var(--surface);
+    transition: transform 0.4s var(--spring);
+  }
+
+  .nodes i:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    width: 22px;
+    border-top: 1.5px dashed var(--ink-faint);
+  }
+
+  .nodes i:last-child {
+    margin-right: 0;
+  }
+
+  .nodes .issue {
+    border-color: var(--red);
+    background: #fce8e6;
+  }
+
+  .step:hover .nodes .issue {
+    transform: translateY(-5px);
+  }
+
+  .note.red {
+    color: var(--red);
+  }
+
+  .note.green {
+    color: var(--green-ink);
+  }
+
+  .pair {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .card {
+    display: grid;
+    gap: 7px;
+    min-width: 150px;
+    padding: 16px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .card b {
+    padding: 5px 9px;
+    border-radius: 6px;
+    background: var(--yellow-soft);
+    color: var(--yellow-ink);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .solved {
+    border-color: var(--blue);
+  }
+
+  .solved .nodes i {
+    width: 26px;
+    height: 20px;
+    margin-right: 14px;
+    border-color: var(--blue);
+  }
+
+  .solved .nodes i:not(:last-child)::after {
+    width: 14px;
+    border-color: var(--blue);
+  }
+
+  .to {
+    font-size: 20px;
+    color: var(--ink);
+    transition: transform 0.4s var(--spring);
+  }
+
+  .step:hover .to {
+    transform: translateX(5px);
+  }
+
+  .options {
+    display: grid;
+    grid-template-columns: repeat(3, 84px);
+    gap: 14px;
+    justify-items: center;
+  }
+
+  .option {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 84px;
+    height: 104px;
+    border-radius: 14px;
+    border: 1.5px solid var(--line-strong);
+    background: var(--surface);
+    color: var(--ink-faint);
+    font-family: var(--font-sans);
+    font-size: 26px;
+    font-weight: 600;
+    transition: transform 0.4s var(--spring);
+  }
+
+  .picked {
+    border-color: var(--blue);
+    color: var(--blue);
+    box-shadow: 0 0 0 4px var(--blue-soft);
+  }
+
+  .step:hover .picked {
+    transform: translateY(-8px);
+  }
+
+  .tick {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    translate: -50% 0;
+    padding: 3px 7px;
+    border-radius: 999px;
+    background: var(--blue);
+    color: #fff;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .wide {
+    grid-column: 1 / -1;
+    margin-top: 16px;
+    text-align: center;
+  }
+
+  .more {
+    margin-top: 28px;
+  }
+
+  @media (max-width: 860px) {
+    .step {
+      grid-template-columns: 1fr;
+    }
+
+    .step:nth-child(even) .copy {
+      order: 0;
+    }
+
+    .panel {
+      min-height: 210px;
+    }
+  }
+
+  @media (max-width: 440px) {
+    .pair {
+      flex-direction: column;
+    }
+
+    .to {
+      rotate: 90deg;
+    }
+  }
+</style>

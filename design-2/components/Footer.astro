@@ -1,0 +1,64 @@
+---
+import { site } from '../../src/data/site';
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="col inner">
+    <span>© {year} {site.name}.</span>
+    <span class="links">
+      <a href={site.linkedin} target="_blank" rel="noopener">
+        LinkedIn <span class="arrow" aria-hidden="true">→</span><span class="sr-only"> (opens in a new tab)</span>
+      </a>
+      <a href="#main">Back to top <span class="up" aria-hidden="true">↑</span></a>
+    </span>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    padding-block: 28px 36px;
+    font-size: 13px;
+    color: var(--ink-faint);
+  }
+
+  .inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 24px;
+  }
+
+  .links {
+    display: flex;
+    gap: 22px;
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 40px;
+    transition: color 0.2s var(--ease);
+  }
+
+  a:hover {
+    color: var(--accent);
+  }
+
+  .up {
+    display: inline-block;
+    transition: transform 0.25s var(--ease);
+  }
+
+  a:hover .up {
+    transform: translateY(-3px);
+  }
+
+  @media print {
+    .footer {
+      display: none;
+    }
+  }
+</style>

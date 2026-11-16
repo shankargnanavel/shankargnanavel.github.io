@@ -1,0 +1,188 @@
+---
+import { recognition, spec } from '../../src/data/site';
+
+const { impact } = spec;
+const awards = recognition.items.filter((item) => item.type === 'Award');
+const others = recognition.items.length - awards.length;
+---
+
+<section id="impact" class="section" data-section="impact" aria-labelledby="impact-title">
+  <div class="wrap">
+    <div class="head" data-reveal>
+      <div>
+        <p class="eyebrow">{impact.eyebrow}</p>
+        <h2 id="impact-title" class="title">{impact.title} <span class="serif">{impact.emphasis}</span></h2>
+      </div>
+      <p class="head-intro">{impact.intro}</p>
+    </div>
+
+    <ul class="grid">
+      <li class="tile lead" data-reveal>
+        <p class="source">{impact.lead.source}</p>
+        <p class="value">{impact.lead.value}</p>
+        <p class="label">{impact.lead.label}</p>
+      </li>
+      {
+        impact.tiles.map((tile, i) => (
+          <li class="tile" data-reveal style={`--d:${(i % 2) + 1}`}>
+            <p class="source">{tile.source}</p>
+            <p class="value">{tile.value}</p>
+            <p class="label">{tile.label}</p>
+          </li>
+        ))
+      }
+      <li class="tile wide" data-reveal>
+        <p class="source">Recognition</p>
+        <ul class="awards">
+          {
+            awards.map((award) => (
+              <li>
+                <p class="award">{award.title}</p>
+                <p class="label">
+                  {award.issuer} · {award.date}
+                </p>
+              </li>
+            ))
+          }
+          <li>
+            <p class="award">{others}</p>
+            <p class="label">certificates and memberships, from journey mapping to personas</p>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .tile {
+    display: flex;
+    flex-direction: column;
+    padding: 22px 24px 24px;
+    border-radius: 20px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    transition:
+      translate 0.4s var(--ease-out),
+      border-color 0.2s var(--ease),
+      box-shadow 0.4s var(--ease),
+      opacity 0.7s var(--ease-out),
+      transform 0.7s var(--ease-out);
+  }
+
+  .tile:hover {
+    translate: 0 -4px;
+    border-color: var(--line-strong);
+    box-shadow: 0 24px 40px -32px rgba(31, 31, 31, 0.5);
+  }
+
+  .source {
+    min-height: 2.8em;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.4;
+    color: var(--ink-faint);
+  }
+
+  .value {
+    margin-top: 10px;
+    font-size: clamp(38px, 4vw, 50px);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.045em;
+  }
+
+  .label {
+    margin-top: 10px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+
+  /* The large dark tile carries the current work. */
+  .lead {
+    grid-column: span 2;
+    grid-row: span 2;
+    justify-content: flex-end;
+    padding: clamp(24px, 3vw, 36px);
+    border-color: transparent;
+    border-radius: var(--radius-lg);
+    background: #1f1f1f;
+    color: #fff;
+  }
+
+  .lead .source {
+    margin-bottom: auto;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .lead .value {
+    font-size: clamp(84px, 12vw, 168px);
+    letter-spacing: -0.06em;
+  }
+
+  .lead .label {
+    max-width: 40ch;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.82);
+  }
+
+  .wide {
+    grid-column: span 2;
+  }
+
+  .awards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px 20px;
+    margin-top: 10px;
+  }
+
+  .award {
+    font-size: 21px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .awards .label {
+    margin-top: 4px;
+    font-size: 13px;
+  }
+
+  @media (max-width: 1000px) {
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .lead {
+      grid-row: auto;
+      min-height: 320px;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+
+    .lead,
+    .wide {
+      grid-column: auto;
+    }
+
+    .awards {
+      grid-template-columns: 1fr;
+    }
+
+    .source {
+      min-height: 0;
+    }
+  }
+</style>

@@ -1,0 +1,139 @@
+---
+import { Image } from 'astro:assets';
+import RevealText from './RevealText.astro';
+import { site, statement } from '../data/site';
+import { projects } from '../data/projects';
+import { findImage } from '../lib/images';
+
+const avatar = findImage('profile/avatar.jpg');
+const sheets = projects
+  .map((project) => findImage(project.cover))
+  .filter((image) => !!image)
+  .slice(0, 2);
+---
+
+<section id="about" class="section statement" data-section="home" aria-label="About me">
+  <div class="wrap layout">
+    <RevealText segments={statement} class="text" />
+
+    <div class="stack" data-reveal>
+      {
+        sheets.map((image, i) => (
+          <div class={`sheet sheet-${i}`}>
+            <Image src={image!} alt="" width={720} widths={[360, 720]} sizes="260px" format="webp" quality={72} />
+          </div>
+        ))
+      }
+      {
+        avatar && (
+          <div class="sheet sheet-top">
+            <Image src={avatar} alt={`Portrait of ${site.name}`} widths={[280, 500]} sizes="260px" format="webp" />
+          </div>
+        )
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .statement {
+    overflow-x: clip;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 400px;
+    align-items: center;
+    gap: clamp(32px, 7vw, 96px);
+  }
+
+  .layout :global(.text) {
+    max-width: 33em;
+    font-size: clamp(17px, 1.75vw, 21px);
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
+
+  /* Fanned stack: two project screens behind, portrait on top. */
+  .stack {
+    position: relative;
+    height: 400px;
+  }
+
+  .sheet {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 236px;
+    height: 308px;
+    margin: -154px 0 0 -118px;
+    border-radius: 22px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    box-shadow: 0 30px 70px -10px rgba(0, 0, 0, 0.75);
+    transform: translate(var(--x, 0), var(--y, 0)) rotate(var(--r, 0deg));
+    transition: transform 0.7s var(--ease-out);
+  }
+
+  .sheet :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 86% 50%;
+  }
+
+  .sheet-0 {
+    --x: -66px;
+    --y: -6px;
+    --r: -15deg;
+  }
+
+  .sheet-1 {
+    --x: 62px;
+    --y: -16px;
+    --r: 12deg;
+  }
+
+  .sheet-top {
+    --y: 16px;
+    --r: 3deg;
+    background: var(--accent);
+  }
+
+  /* Duotone: the white studio background takes the accent colour. */
+  .sheet-top :global(img) {
+    object-position: 50% 20%;
+    filter: grayscale(1) contrast(1.2);
+    mix-blend-mode: multiply;
+  }
+
+  .stack:hover .sheet-0 {
+    --x: -112px;
+    --y: 4px;
+    --r: -22deg;
+  }
+
+  .stack:hover .sheet-1 {
+    --x: 108px;
+    --y: -8px;
+    --r: 20deg;
+  }
+
+  .stack:hover .sheet-top {
+    --y: 6px;
+    --r: 0deg;
+  }
+
+  @media (max-width: 900px) {
+    .layout {
+      grid-template-columns: 1fr;
+      gap: 56px;
+    }
+
+    .stack {
+      height: 360px;
+      scale: 0.9;
+    }
+  }
+</style>

@@ -1,0 +1,134 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import TypeCover from './TypeCover.astro';
+import { findImage } from '../lib/images';
+import type { Project } from '../data/projects';
+
+interface Props {
+  project: Project;
+  /** Use "h2" when the card sits directly under a page title. */
+  heading?: 'h2' | 'h3';
+}
+
+const { project, heading: Heading = 'h3' } = Astro.props;
+const image = findImage(project.cover);
+---
+
+<article class="card">
+  <div class="thumb" style={`view-transition-name: cover-${project.slug}`}>
+    {
+      image ? (
+        <Image
+          src={image}
+          alt=""
+          width={720}
+          widths={[400, 720, 1080]}
+          sizes="(min-width: 960px) 340px, (min-width: 640px) 46vw, 92vw"
+          format="webp"
+          quality={78}
+        />
+      ) : (
+        <TypeCover name={project.name} label={project.label} />
+      )
+    }
+  </div>
+  <p class="label">{project.label}</p>
+  <Heading class="title"><a href={`/work/${project.slug}/`}>{project.name}</a></Heading>
+  <p class="desc">{project.card}</p>
+  <span class="more" aria-hidden="true">View case study <Icon name="arrow-up-right" size={14} /></span>
+</article>
+
+<style>
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 20px;
+    border-radius: var(--radius);
+    background: var(--surface);
+    transition:
+      transform 0.45s var(--ease-out),
+      background-color 0.3s var(--ease),
+      box-shadow 0.45s var(--ease-out);
+  }
+
+  .card:hover,
+  .card:focus-within {
+    transform: translateY(-6px);
+    background: var(--surface-2);
+    box-shadow:
+      0 0 0 1px rgba(var(--accent-rgb), 0.4),
+      0 30px 60px -30px rgba(var(--accent-rgb), 0.35);
+  }
+
+  .thumb {
+    aspect-ratio: 16 / 11;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--surface-3);
+  }
+
+  .thumb :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s var(--ease-out);
+  }
+
+  .thumb :global(.type-cover) {
+    transition: transform 0.8s var(--ease-out);
+  }
+
+  .card:hover .thumb :global(img),
+  .card:hover .thumb :global(.type-cover) {
+    transform: scale(1.045);
+  }
+
+  .label {
+    margin-top: 18px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+
+  .title {
+    margin-top: 6px;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: 0;
+  }
+
+  /* The whole card is the link target. */
+  .title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius);
+  }
+
+  .title a:focus-visible {
+    outline: none;
+  }
+
+  .title a:focus-visible::after {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .desc {
+    margin: 10px 0 18px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  .more {
+    margin-top: auto;
+    align-self: flex-start;
+  }
+</style>

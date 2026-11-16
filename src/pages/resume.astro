@@ -1,0 +1,387 @@
+---
+/**
+ * The web resume. It is built from src/data/site.ts, so it never goes out of
+ * date, and it prints cleanly (Print → Save as PDF).
+ */
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { education, recognition, resume, site, skills, tools } from '../data/site';
+
+const awards = recognition.items.filter((item) => item.type === 'Award');
+const certificates = recognition.items.filter((item) => item.type !== 'Award');
+const linkedinLabel = site.linkedin.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+---
+
+<Base
+  title={`Resume | ${site.name}`}
+  description={`Resume of ${site.name}, ${site.role} in ${site.location}.`}
+  active="resume"
+>
+  <article class="wrap resume">
+    <header class="top">
+      <div>
+        <h1>{site.name}</h1>
+        <p class="role">{site.role} · {site.location}</p>
+        <ul class="contacts">
+          <li><a href={`mailto:${site.email}`}><Icon name="mail" size={15} />{site.email}</a></li>
+          <li><a href={site.linkedin}><Icon name="linkedin" size={15} />{linkedinLabel}</a></li>
+        </ul>
+      </div>
+      <div class="actions">
+        <button type="button" class="pill pill--accent" data-print>
+          <Icon name="printer" size={16} /> Print or save as PDF
+        </button>
+        {
+          site.resumePdf && (
+            <a class="pill" href={site.resumePdf} download>
+              <Icon name="download" size={16} /> Download PDF
+            </a>
+          )
+        }
+      </div>
+    </header>
+
+    <section class="row">
+      <h2>Summary</h2>
+      <div><p class="summary">{resume.summary}</p></div>
+    </section>
+
+    <section class="row">
+      <h2>Experience</h2>
+      <div class="jobs">
+        {
+          resume.experience.map((job) => (
+            <div class="job">
+              <h3>
+                {job.company} <span class="place">{[job.note, job.location].filter(Boolean).join(' · ')}</span>
+              </h3>
+              {job.roles.map((role) => (
+                <div class="position">
+                  <p class="position-head">
+                    <strong>{role.title}</strong>
+                    <span class="dates">{role.dates}</span>
+                  </p>
+                  <ul>
+                    {role.bullets.map((bullet) => (
+                      <li>{bullet}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="row">
+      <h2>Skills</h2>
+      <div>
+        <p>{skills.join(' · ')}</p>
+        <p class="sub"><strong>Tools:</strong> {tools.join(' · ')}</p>
+      </div>
+    </section>
+
+    <section class="row">
+      <h2>Education</h2>
+      <div>
+        <p><strong>{education.degree}</strong></p>
+        <p class="sub">{education.school} · {education.dates}</p>
+      </div>
+    </section>
+
+    <section class="row">
+      <h2>Recognition</h2>
+      <div>
+        <ul class="plain">
+          {
+            awards.map((item) => (
+              <li>
+                <strong>{item.title}</strong>, {item.issuer}. {item.note}
+              </li>
+            ))
+          }
+          {
+            certificates.map((item) => (
+              <li>
+                <strong>{item.title}</strong>, {item.issuer}
+                {item.date && <span class="dates"> · {item.date}</span>}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+  </article>
+</Base>
+
+<style>
+  .resume {
+    --wrap: 940px;
+    padding-top: clamp(150px, 20vw, 180px);
+  }
+
+  .top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 32px;
+  }
+
+  h1 {
+    font-size: clamp(36px, 6vw, 60px);
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+  }
+
+  .role {
+    margin-top: 8px;
+    font-size: 18px;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .contacts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 24px;
+    margin-top: 14px;
+    font-size: 14.5px;
+  }
+
+  .contacts a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 32px;
+    color: var(--muted);
+    transition: color 0.2s var(--ease);
+  }
+
+  .contacts a:hover {
+    color: var(--accent);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .actions .pill:hover :global(svg) {
+    transform: none;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 170px minmax(0, 1fr);
+    gap: 24px;
+    padding-block: 30px;
+    border-top: 1px solid var(--line);
+  }
+
+  h2 {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding-top: 5px;
+  }
+
+  p {
+    color: var(--muted);
+    line-height: 1.65;
+  }
+
+  .summary {
+    font-size: 17px;
+    color: var(--text);
+  }
+
+  strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .sub {
+    margin-top: 8px;
+    font-size: 15px;
+  }
+
+  .jobs {
+    display: grid;
+    gap: 34px;
+  }
+
+  h3 {
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    line-height: 1.3;
+  }
+
+  .place {
+    margin-left: 6px;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--dim);
+  }
+
+  .position {
+    margin-top: 16px;
+  }
+
+  .position-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 4px 16px;
+  }
+
+  .dates {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    letter-spacing: 0;
+    color: var(--dim);
+  }
+
+  .position ul,
+  .plain {
+    display: grid;
+    gap: 7px;
+    margin-top: 10px;
+  }
+
+  .position li,
+  .plain li {
+    position: relative;
+    padding-left: 18px;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  .position li::before,
+  .plain li::before {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 0.68em;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .plain {
+    margin-top: 0;
+  }
+
+  @media (max-width: 720px) {
+    .row {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+  }
+
+  /* On paper: black on white, no chrome, compact spacing. */
+  @media print {
+    .resume {
+      --text: #000;
+      --muted: #1c1c1c;
+      --dim: #4a4a4a;
+      --accent: #0a6b43;
+      --line: #c9c9c9;
+      width: 100%;
+      padding-top: 0;
+      color: #000;
+    }
+
+    .actions {
+      display: none;
+    }
+
+    .top {
+      padding-bottom: 14px;
+    }
+
+    h1 {
+      font-size: 30px;
+    }
+
+    .role {
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .contacts {
+      margin-top: 6px;
+      font-size: 11.5px;
+    }
+
+    .row {
+      grid-template-columns: 110px minmax(0, 1fr);
+      gap: 14px;
+      padding-block: 12px;
+    }
+
+    h2 {
+      font-size: 9.5px;
+      padding-top: 3px;
+    }
+
+    h3 {
+      font-size: 13px;
+    }
+
+    .summary,
+    p,
+    .sub,
+    .position li,
+    .plain li {
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .place,
+    .dates {
+      font-size: 10px;
+    }
+
+    .jobs {
+      gap: 14px;
+    }
+
+    .position {
+      margin-top: 8px;
+      break-inside: avoid;
+    }
+
+    .position ul,
+    .plain {
+      gap: 3px;
+      margin-top: 4px;
+    }
+  }
+</style>
+
+<style is:global>
+  @media print {
+    @page {
+      size: A4;
+      margin: 14mm 15mm;
+    }
+
+    html,
+    body {
+      background: #fff !important;
+      color: #000 !important;
+      letter-spacing: 0;
+    }
+  }
+</style>

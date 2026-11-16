@@ -1,0 +1,104 @@
+---
+import { journey, spec } from '../../src/data/site';
+
+// "May 2025 – Present" becomes "2025 · now"; "May 2021 – May 2025" becomes "2021 to 2025".
+const years = (dates: string) => {
+  const found = dates.match(/\d{4}/g) ?? [];
+  if (/present/i.test(dates)) return { text: `${found[0]} · now`, now: true };
+  return { text: found.length > 1 ? `${found[0]} to ${found[found.length - 1]}` : (found[0] ?? dates), now: false };
+};
+---
+
+<section id="path" class="section" data-section="path" aria-labelledby="path-title">
+  <div class="wrap">
+    <div class="head" data-reveal>
+      <div>
+        <p class="eyebrow">{spec.path.eyebrow}</p>
+        <h2 id="path-title" class="title">{spec.path.title} <span class="serif">{spec.path.emphasis}</span></h2>
+      </div>
+      <p class="head-intro">{spec.path.intro}</p>
+    </div>
+
+    <ol class="rows">
+      {
+        journey.cards.map((item) => {
+          const when = years(item.dates);
+          return (
+            <li class:list={['row', { current: when.now }]} data-reveal>
+              <h3>{item.company}</h3>
+              <p class="role">{item.role}</p>
+              <p class="story">{item.story}</p>
+              <span class:list={['chip', { 'chip-now': when.now }]}>{when.text}</span>
+            </li>
+          );
+        })
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .rows {
+    border-top: 1px solid var(--line);
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1.25fr) minmax(0, 2.6fr) auto;
+    align-items: center;
+    gap: 8px 32px;
+    padding: 26px 14px;
+    border-bottom: 1px solid var(--line);
+    transition:
+      background-color 0.25s var(--ease),
+      opacity 0.7s var(--ease-out),
+      transform 0.7s var(--ease-out);
+  }
+
+  .row:hover,
+  .current {
+    background: var(--surface);
+  }
+
+  h3 {
+    font-size: clamp(19px, 1.9vw, 23px);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+  }
+
+  .role {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink-soft);
+  }
+
+  .story {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+  }
+
+  .chip {
+    justify-self: end;
+  }
+
+  @media (max-width: 960px) {
+    .row {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .role {
+      grid-column: 1;
+    }
+
+    .story {
+      grid-column: 1 / -1;
+    }
+
+    .chip {
+      grid-row: 1;
+      grid-column: 2;
+    }
+  }
+</style>

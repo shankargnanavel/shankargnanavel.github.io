@@ -1,0 +1,73 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import Work from '../components/Work.astro';
+import Rows, { type Row } from '../components/Rows.astro';
+import Process from '../components/Process.astro';
+import Outside from '../components/Outside.astro';
+import Connect from '../components/Connect.astro';
+import { education, recognition, resume } from '../../src/data/site';
+
+const initials = (name: string) =>
+  name
+    .split(/\s+/)
+    .filter((word) => /^[A-Za-z]/.test(word))
+    .slice(0, 2)
+    .map((word) => word[0].toUpperCase())
+    .join('');
+
+const dash = (dates: string) => dates.replace(/\s[–-]\s/g, ' — ');
+
+const experienceRows: Row[] = resume.experience.map((job) => ({
+  badge: initials(job.short),
+  name: job.short,
+  note: job.note,
+  lines: job.roles.map((role) => ({ text: role.title, meta: dash(role.dates) })),
+}));
+
+const educationRows: Row[] = [
+  {
+    badge: initials(education.school),
+    name: education.school,
+    lines: [{ text: education.degree, meta: dash(education.dates) }],
+  },
+];
+
+const recognitionRows: Row[] = recognition.items.map((item) => ({
+  badge: item.type === 'Award' ? 'award' : 'check',
+  name: item.title,
+  lines: [{ text: item.note ? `${item.issuer}. ${item.note}` : item.issuer, meta: item.date }],
+}));
+---
+
+<Base>
+  <Hero />
+  <Work />
+
+  <section id="experience" class="block" aria-labelledby="experience-label">
+    <div class="col">
+      <h2 id="experience-label" class="kicker">Experience</h2>
+      <Rows rows={experienceRows} />
+    </div>
+  </section>
+
+  <Process />
+
+  <section id="education" class="block" aria-labelledby="education-label">
+    <div class="col">
+      <h2 id="education-label" class="kicker">Where I studied</h2>
+      <Rows rows={educationRows} />
+    </div>
+  </section>
+
+  <Outside />
+
+  <section id="recognition" class="block" aria-labelledby="recognition-label">
+    <div class="col">
+      <h2 id="recognition-label" class="kicker">Recognition</h2>
+      <Rows rows={recognitionRows} />
+    </div>
+  </section>
+
+  <Connect />
+</Base>

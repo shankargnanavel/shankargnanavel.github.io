@@ -1,0 +1,174 @@
+---
+import Icon from '../../src/components/Icon.astro';
+import { site, spec } from '../../src/data/site';
+
+const { contact } = spec;
+const linkedinLabel = site.linkedin.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+---
+
+<section id="contact" class="section" data-section="contact" aria-labelledby="contact-title">
+  <div class="wrap">
+    <div class="block" data-reveal>
+      <div class="rings" aria-hidden="true"></div>
+
+      <p class="eyebrow">{contact.eyebrow}</p>
+      <h2 id="contact-title" class="big">{contact.title} <span class="serif">{contact.emphasis}</span></h2>
+      <p class="text">{contact.text}</p>
+
+      <div class="actions">
+        <a class="pill solid" href={`mailto:${site.email}`}>{site.email}</a>
+        <button type="button" class="pill" data-copy={site.email} aria-live="polite">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="9" y="9" width="11" height="11" rx="2.5"></rect>
+            <path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15"></path>
+          </svg>
+          <span data-copy-label>Copy email</span>
+        </button>
+        {
+          site.resumePdf && (
+            <a class="pill" href={site.resumePdf} target="_blank" rel="noopener">
+              <Icon name="file" size={15} /> Resume
+              <span class="sr-only">(PDF, opens in a new tab)</span>
+            </a>
+          )
+        }
+      </div>
+
+      <dl class="facts">
+        <div>
+          <dt>Now</dt>
+          <dd>{contact.now}</dd>
+        </div>
+        <div>
+          <dt>Before</dt>
+          <dd>{contact.before}</dd>
+        </div>
+        <div>
+          <dt>Elsewhere</dt>
+          <dd>
+            <a href={site.linkedin} target="_blank" rel="noopener">
+              LinkedIn<span class="sr-only"> (opens in a new tab)</span>
+            </a>
+            <span aria-hidden="true"> · </span>{linkedinLabel.replace('linkedin.com/', '')}
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<style>
+  .block {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding: clamp(32px, 6vw, 86px);
+    border-radius: clamp(24px, 3vw, 36px);
+    background: var(--blue);
+    color: #fff;
+  }
+
+  .rings {
+    position: absolute;
+    right: -180px;
+    top: -260px;
+    width: 760px;
+    aspect-ratio: 1;
+    z-index: -1;
+    border-radius: 50%;
+    background: repeating-radial-gradient(circle, transparent 0 84px, rgba(255, 255, 255, 0.16) 84px 85px);
+    -webkit-mask-image: radial-gradient(circle, #000 30%, transparent 70%);
+    mask-image: radial-gradient(circle, #000 30%, transparent 70%);
+  }
+
+  .eyebrow {
+    color: rgba(255, 255, 255, 0.78);
+  }
+
+  .big {
+    font-size: clamp(54px, 9vw, 108px);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.045em;
+  }
+
+  .text {
+    max-width: 44ch;
+    margin-top: 22px;
+    font-size: 17px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 30px;
+  }
+
+  .actions .pill {
+    --pill-fg: #fff;
+    --pill-bd: rgba(255, 255, 255, 0.6);
+    min-height: 48px;
+    padding: 0 20px;
+    font-size: 14.5px;
+  }
+
+  .actions .pill:hover {
+    --pill-bd: #fff;
+    --pill-bg: rgba(255, 255, 255, 0.12);
+  }
+
+  .actions .solid {
+    --pill-fg: var(--blue);
+    --pill-bg: #fff;
+    --pill-bd: #fff;
+  }
+
+  .actions .solid:hover {
+    --pill-bg: var(--blue-soft);
+    --pill-bd: var(--blue-soft);
+  }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px 32px;
+    margin-top: clamp(36px, 6vw, 72px);
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.28);
+  }
+
+  dt {
+    margin-bottom: 8px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  dd {
+    font-size: 14.5px;
+    line-height: 1.55;
+  }
+
+  dd a {
+    display: inline-block;
+    padding-block: 4px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  dd a:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  @media (max-width: 760px) {
+    .facts {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,41 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../../src/data/site';
+---
+
+<Base title={`Page not found | ${site.name}`} description="This page does not exist.">
+  <section class="wrap lost">
+    <p class="eyebrow">Error 404</p>
+    <h1 class="title">This page took a <span class="serif">wrong turn.</span></h1>
+    <p class="text">The link is broken or the page has moved. The work is still where it was.</p>
+    <p class="actions">
+      <a class="pill pill-primary" href="/#work">See the work <span class="arrow" aria-hidden="true">→</span></a>
+      <a class="pill" href="/">Back to home</a>
+    </p>
+  </section>
+</Base>
+
+<style>
+  .lost {
+    display: grid;
+    align-content: center;
+    justify-items: start;
+    min-height: 76svh;
+    padding-block: 140px 60px;
+  }
+
+  .text {
+    max-width: 44ch;
+    margin-top: 18px;
+    font-size: 17px;
+    color: var(--ink-soft);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-top: 30px;
+  }
+</style>

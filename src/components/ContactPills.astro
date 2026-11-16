@@ -1,0 +1,35 @@
+---
+/** The three contact buttons, reused on the home page and at the end of each case study. */
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+---
+
+<div class="contact-pills">
+  <a class="pill pill--accent" href={`mailto:${site.email}`}>
+    <Icon name="mail" size={16} />
+    Email me
+  </a>
+  <a class="pill" href={site.linkedin} target="_blank" rel="noopener">
+    <Icon name="linkedin" size={16} />
+    LinkedIn
+    <span class="sr-only">(opens in a new tab)</span>
+  </a>
+  <a class="pill" href="/resume/">
+    <Icon name="file" size={16} />
+    Resume
+  </a>
+</div>
+
+<style>
+  .contact-pills {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  /* Icons on the left should not drift on hover. */
+  .contact-pills .pill:hover :global(svg) {
+    transform: none;
+  }
+</style>

@@ -1,0 +1,426 @@
+---
+import { projects } from '../../src/data/projects';
+import { site, spec } from '../../src/data/site';
+
+// Card colours repeat in this order.
+const tones = ['dark', 'white', 'yellow', 'blue'];
+
+const cards = projects.map((project, i) => {
+  const role = project.meta.find((item) => item.label === 'Role')?.value ?? '';
+  const live = project.status !== 'in-progress';
+  return { project, role, live, tone: tones[i % tones.length] };
+});
+---
+
+<section id="work" class="section" data-section="work" aria-labelledby="work-title">
+  <div class="wrap">
+    <div class="head" data-reveal>
+      <div>
+        <p class="eyebrow">{spec.work.eyebrow}</p>
+        <h2 id="work-title" class="title">{spec.work.title} <span class="serif">{spec.work.emphasis}</span></h2>
+      </div>
+      <p class="head-intro">{spec.work.intro}</p>
+    </div>
+
+    <ul class="grid">
+      {
+        cards.map(({ project, role, live, tone }, i) => (
+          <li class={`case tone-${tone}`} data-case data-reveal style={`--d:${i % 2}`}>
+            <div class="inner">
+              <article class="face front" data-face="front">
+                {project.tags && (
+                  <ul class="tags" aria-label="Tags">
+                    {project.tags.map((tag) => (
+                      <li>{tag}</li>
+                    ))}
+                  </ul>
+                )}
+                <h3 class="brand">{project.name}</h3>
+                <p class="meta">
+                  {project.label}
+                  <br />
+                  {role}
+                </p>
+
+                <p class="big">{project.stat?.value}</p>
+                <p class="expl">{project.stat?.label}</p>
+
+                <p class="story">{project.summary}</p>
+                <div class="actions">
+                  {live ? (
+                    <a class="pill" href={`/work/${project.slug}/`}>
+                      Read the case study <span class="arrow" aria-hidden="true">→</span>
+                      <span class="sr-only">: {project.name}</span>
+                    </a>
+                  ) : (
+                    <span class="pill is-static">In progress</span>
+                  )}
+                  <button type="button" class="pill" data-flip>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M3 12a9 9 0 0 1 15.5-6.3L21 8M21 3v5h-5M21 12a9 9 0 0 1-15.5 6.3L3 16M3 21v-5h5" />
+                    </svg>
+                    Flip<span class="sr-only"> the {project.name} card</span>
+                  </button>
+                </div>
+              </article>
+
+              <article class="face back" data-face="back">
+                <p class="back-label">{project.name} · the 30-second story</p>
+                {project.tldr.problem ? (
+                  <dl class="tldr">
+                    <div>
+                      <dt>Problem</dt>
+                      <dd>{project.tldr.problem}</dd>
+                    </div>
+                    <div>
+                      <dt>My role</dt>
+                      <dd>{project.tldr.role}</dd>
+                    </div>
+                    <div>
+                      <dt>Outcome</dt>
+                      <dd>{project.tldr.outcome}</dd>
+                    </div>
+                  </dl>
+                ) : (
+                  <dl class="tldr">
+                    <div>
+                      <dt>What it is</dt>
+                      <dd>{project.card}</dd>
+                    </div>
+                    {project.meta.map((item) => (
+                      <div>
+                        <dt>{item.label}</dt>
+                        <dd>{item.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                )}
+                <div class="actions">
+                  {live ? (
+                    <a class="pill" href={`/work/${project.slug}/`}>
+                      Read the case study <span class="arrow" aria-hidden="true">→</span>
+                      <span class="sr-only">: {project.name}</span>
+                    </a>
+                  ) : (
+                    <a class="pill" href={`mailto:${site.email}?subject=${encodeURIComponent(project.name)}`}>
+                      Ask for a walkthrough <span class="arrow" aria-hidden="true">→</span>
+                    </a>
+                  )}
+                  <button type="button" class="pill" data-flip>
+                    Flip back
+                  </button>
+                </div>
+              </article>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+
+    <aside class="archive" data-reveal aria-labelledby="archive-title">
+      <p class="count">
+        <span class="count-label">The archive</span>
+        +{spec.archive.items.length}
+      </p>
+      <div>
+        <h3 id="archive-title">{spec.archive.title}</h3>
+        <p class="archive-text">{spec.archive.text}</p>
+        <ul class="items">
+          {spec.archive.items.map((item) => <li>{item}</li>)}
+        </ul>
+      </div>
+      <a class="pill" href={`mailto:${site.email}?subject=${encodeURIComponent('Your other work')}`}>
+        {spec.archive.cta} <span class="arrow" aria-hidden="true">→</span>
+      </a>
+    </aside>
+  </div>
+</section>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  /* Flip card */
+  .case {
+    perspective: 1800px;
+    transition:
+      opacity 0.7s var(--ease-out),
+      transform 0.7s var(--ease-out);
+  }
+
+  .inner {
+    position: relative;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.75s var(--ease-out);
+  }
+
+  .case:global(.is-flipped) .inner {
+    transform: rotateY(180deg);
+  }
+
+  .face {
+    display: flex;
+    flex-direction: column;
+    min-height: 600px;
+    height: 100%;
+    padding: clamp(24px, 3vw, 36px);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--card-bd, transparent);
+    background: var(--card-bg);
+    color: var(--card-fg);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transition:
+      box-shadow 0.4s var(--ease),
+      translate 0.4s var(--ease-out);
+  }
+
+  .case:hover .face {
+    translate: 0 -4px;
+    box-shadow: 0 30px 60px -36px rgba(31, 31, 31, 0.55);
+  }
+
+  .back {
+    position: absolute;
+    inset: 0;
+    overflow: auto;
+    transform: rotateY(180deg);
+  }
+
+  .tone-dark {
+    --card-bg: #1f1f1f;
+    --card-fg: #ffffff;
+    --card-soft: rgba(255, 255, 255, 0.78);
+    --card-line: rgba(255, 255, 255, 0.4);
+  }
+
+  .tone-white {
+    --card-bg: #ffffff;
+    --card-fg: var(--ink);
+    --card-bd: var(--line);
+    --card-soft: var(--ink-soft);
+    --card-line: var(--line-strong);
+  }
+
+  .tone-yellow {
+    --card-bg: var(--yellow-soft);
+    --card-fg: var(--yellow-ink);
+    --card-soft: rgba(61, 44, 0, 0.82);
+    --card-line: rgba(61, 44, 0, 0.42);
+  }
+
+  .tone-blue {
+    --card-bg: var(--blue);
+    --card-fg: #ffffff;
+    --card-soft: rgba(255, 255, 255, 0.86);
+    --card-line: rgba(255, 255, 255, 0.5);
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .tags li {
+    padding: 4px 7px;
+    border-radius: 5px;
+    border: 1px solid var(--card-line);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .brand {
+    margin-top: 26px;
+    font-size: clamp(24px, 2.6vw, 31px);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+
+  .meta {
+    margin-top: 14px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--card-soft);
+  }
+
+  .big {
+    margin-top: auto;
+    padding-top: 36px;
+    font-size: clamp(60px, 7.4vw, 92px);
+    font-weight: 600;
+    line-height: 0.92;
+    letter-spacing: -0.05em;
+  }
+
+  .expl {
+    max-width: 40ch;
+    margin-top: 14px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--card-soft);
+  }
+
+  .story {
+    max-width: 30ch;
+    margin-top: 36px;
+    font-size: clamp(19px, 1.9vw, 23.5px);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 22px;
+  }
+
+  .face .pill {
+    --pill-fg: var(--card-fg);
+    --pill-bd: var(--card-line);
+  }
+
+  .is-static {
+    border-style: dashed;
+    pointer-events: none;
+  }
+
+  .back-label {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--card-soft);
+  }
+
+  .tldr {
+    display: grid;
+    gap: 0;
+    margin-top: 18px;
+  }
+
+  .tldr div {
+    padding-block: 16px;
+    border-top: 1px solid var(--card-line);
+  }
+
+  .tldr dt {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--card-soft);
+  }
+
+  .tldr dd {
+    margin-top: 6px;
+    font-size: 15.5px;
+    line-height: 1.55;
+  }
+
+  .back .actions {
+    margin-top: auto;
+    padding-top: 16px;
+  }
+
+  /* Archive: a hatched card for the work without a page. */
+  .archive {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: clamp(20px, 3.4vw, 48px);
+    margin-top: 20px;
+    padding: clamp(24px, 3vw, 36px);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--line);
+    background: repeating-linear-gradient(135deg, transparent 0 9px, rgba(31, 31, 31, 0.035) 9px 10px), var(--surface-2);
+  }
+
+  .count {
+    font-size: clamp(52px, 6vw, 72px);
+    font-weight: 600;
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+  }
+
+  .count-label {
+    display: block;
+    margin-bottom: 12px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  .archive h3 {
+    font-size: clamp(21px, 2.2vw, 26px);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .archive-text {
+    margin-top: 4px;
+    font-size: 14.5px;
+    color: var(--ink-soft);
+  }
+
+  .items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .items li {
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    font-size: 13px;
+    color: var(--ink-soft);
+    transition:
+      border-color 0.2s var(--ease),
+      transform 0.3s var(--spring);
+  }
+
+  .items li:hover {
+    border-color: var(--blue);
+    transform: translateY(-2px);
+  }
+
+  .archive .pill {
+    background: var(--surface);
+  }
+
+  @media (max-width: 900px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+
+    .face {
+      min-height: 520px;
+    }
+
+    .archive {
+      grid-template-columns: 1fr;
+      justify-items: start;
+    }
+  }
+</style>

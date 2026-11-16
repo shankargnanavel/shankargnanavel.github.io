@@ -1,0 +1,273 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import { beyond } from '../data/site';
+import { findImage } from '../lib/images';
+
+interface Tile {
+  kind: string;
+  label: string;
+  title?: string;
+  text: string;
+  href?: string;
+  /** Optional photo, path inside src/assets/. */
+  image?: string;
+  alt?: string;
+}
+
+const tiles = (beyond.tiles as Tile[]).map((tile) => ({ ...tile, img: findImage(tile.image) }));
+---
+
+<section id="beyond" class="section beyond" data-section="beyond" aria-labelledby="beyond-title">
+  <div class="wrap board">
+    <div class="head" data-reveal>
+      <p class="eyebrow">{beyond.eyebrow}</p>
+      <h2 id="beyond-title" class="h-mono">{beyond.heading}</h2>
+      <p class="lede">{beyond.subtitle}</p>
+      <a class="pill" href={beyond.cta.href} target="_blank" rel="noopener">
+        <Icon name="linkedin" size={16} />
+        {beyond.cta.label}
+        <span class="sr-only">(opens in a new tab)</span>
+      </a>
+    </div>
+
+    <ul class="tiles">
+      {
+        tiles.map((tile, i) => (
+          <li class={`tile tile-${tile.kind} pos-${i}`} data-reveal style={`--d:${i}`}>
+            {tile.img && (
+              <Image class="photo" src={tile.img} alt={tile.alt ?? ''} widths={[320, 640]} sizes="260px" format="webp" />
+            )}
+            <p class="tile-label">
+              {tile.kind === 'event' && <Icon name="pin" size={13} />}
+              {tile.label}
+            </p>
+            {tile.kind === 'quote' ? (
+              <blockquote>
+                <p>“{tile.text}”</p>
+              </blockquote>
+            ) : (
+              <>
+                {tile.title && (
+                  <h3>{tile.href ? <a href={tile.href}>{tile.title}</a> : tile.title}</h3>
+                )}
+                <p class="tile-text">{tile.text}</p>
+              </>
+            )}
+            {tile.href && (
+              <span class="more" aria-hidden="true">
+                Read the story <Icon name="arrow-up-right" size={14} />
+              </span>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .beyond {
+    isolation: isolate;
+  }
+
+  /* A faint grid behind the board, fading out at the edges. */
+  .beyond::before {
+    content: '';
+    position: absolute;
+    inset: calc(var(--section) - 40px) 0 -40px;
+    z-index: -1;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 30%, transparent 80%);
+    mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 30%, transparent 80%);
+  }
+
+  .head {
+    max-width: 440px;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .head .pill {
+    margin-top: 24px;
+  }
+
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 48px;
+  }
+
+  .tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px;
+    border-radius: 18px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    box-shadow: 0 24px 50px -24px rgba(0, 0, 0, 0.9);
+    transition:
+      rotate 0.5s var(--ease-out),
+      scale 0.5s var(--ease-out),
+      box-shadow 0.5s var(--ease-out),
+      opacity 0.8s var(--ease-out),
+      transform 0.8s var(--ease-out);
+  }
+
+  .tile:hover,
+  .tile:focus-within {
+    z-index: 3;
+    rotate: 0deg;
+    scale: 1.04;
+    box-shadow:
+      0 0 0 1px rgba(var(--accent-rgb), 0.45),
+      0 30px 60px -26px rgba(var(--accent-rgb), 0.4);
+  }
+
+  .photo {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 6px;
+  }
+
+  .tile-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+
+  .tile h3 {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 1.3;
+  }
+
+  .tile h3 a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 18px;
+  }
+
+  .tile h3 a:focus-visible {
+    outline: none;
+  }
+
+  .tile h3 a:focus-visible::after {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .tile-text {
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  .tile .more {
+    margin-top: 6px;
+    align-self: flex-start;
+  }
+
+  .tile:hover .more {
+    color: var(--accent);
+    text-decoration-color: var(--accent);
+  }
+
+  /* Quote tile: big mono type. */
+  .tile-quote blockquote p {
+    font-family: var(--font-mono);
+    font-size: 19px;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    color: var(--accent);
+    text-wrap: balance;
+  }
+
+  /* Note tile: a mint sticky note. */
+  .tile-note {
+    border-color: transparent;
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .tile-note .tile-label,
+  .tile-note .tile-text {
+    color: rgba(3, 23, 14, 0.78);
+  }
+
+  .tile-note .tile-text {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--accent-ink);
+  }
+
+  /* Wide screens: tiles pinned around the heading at an angle. */
+  @media (min-width: 1080px) {
+    .board {
+      position: relative;
+      min-height: 560px;
+      display: grid;
+      place-items: center;
+    }
+
+    .tiles {
+      position: absolute;
+      inset: 0;
+      display: block;
+      margin: 0;
+      pointer-events: none;
+    }
+
+    .tile {
+      position: absolute;
+      width: 258px;
+      pointer-events: auto;
+    }
+
+    .pos-0 {
+      top: 0;
+      left: 0;
+      rotate: -7deg;
+    }
+
+    .pos-1 {
+      bottom: 0;
+      left: 60px;
+      rotate: 5deg;
+    }
+
+    .pos-2 {
+      top: 24px;
+      right: 20px;
+      rotate: 6deg;
+    }
+
+    .pos-3 {
+      bottom: 10px;
+      right: 0;
+      rotate: -4deg;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .tiles {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

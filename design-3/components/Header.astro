@@ -1,0 +1,355 @@
+---
+import Icon from '../../src/components/Icon.astro';
+import { site, spec } from '../../src/data/site';
+
+interface Props {
+  back?: boolean;
+}
+const { back = false } = Astro.props;
+
+const links = [
+  { id: 'work', label: 'Work' },
+  { id: 'path', label: 'Path' },
+  { id: 'process', label: 'Process' },
+];
+
+// What the black pill says in each section.
+const island = {
+  top: { label: site.shortName, sub: spec.island.top },
+  work: { label: 'Work', sub: spec.island.work },
+  path: { label: 'Path', sub: spec.island.path },
+  process: { label: 'Process', sub: spec.island.process },
+  impact: { label: 'Impact', sub: spec.island.impact },
+  contact: { label: 'Contact', sub: spec.island.contact },
+};
+---
+
+<header class="header">
+  <div class="bar">
+    <div class="left">
+      {
+        back ? (
+          <a class="name" href="/">
+            <Icon name="arrow-left" size={16} /> Back to home
+          </a>
+        ) : (
+          <a class="name" href="/#top">
+            {site.name}
+          </a>
+        )
+      }
+      <button type="button" class="icon-btn grid-btn" data-grid-toggle aria-pressed="false">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+          <rect x="3.5" y="4" width="17" height="16" rx="2.5"></rect>
+          <path d="M9.2 4v16M14.8 4v16"></path>
+        </svg>
+        <span class="sr-only">Show the layout grid</span>
+      </button>
+    </div>
+
+    <!-- The island names the section in view and shows scroll progress. -->
+    <div class="island" data-island={JSON.stringify(island)} data-current="top" aria-hidden="true">
+      <span class="island-mark">G</span>
+      <span class="island-text">
+        <span class="island-label" data-island-label>{island.top.label}</span>
+        <span class="island-sub" data-island-sub>{island.top.sub}</span>
+      </span>
+      <svg class="island-ring" viewBox="0 0 24 24" width="22" height="22">
+        <circle cx="12" cy="12" r="9" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="2.5"></circle>
+        <circle
+          data-island-ring
+          cx="12"
+          cy="12"
+          r="9"
+          fill="none"
+          stroke="#fde293"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-dasharray="56.55"
+          stroke-dashoffset="56.55"
+          transform="rotate(-90 12 12)"></circle>
+      </svg>
+    </div>
+
+    <nav class="nav" aria-label="Primary">
+      {
+        !back &&
+          links.map((link) => (
+            <a class="link" href={`/#${link.id}`} data-nav={link.id}>
+              {link.label}
+            </a>
+          ))
+      }
+      <a class="icon-btn" href="/#contact" data-nav="contact">
+        <Icon name="mail" size={17} />
+        <span class="sr-only">Contact</span>
+      </a>
+      <button type="button" class="motion" data-motion-toggle aria-pressed="true">
+        <span class="motion-dot" aria-hidden="true"></span>
+        <span data-motion-label>Motion on</span>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .header {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 80;
+    background: rgba(248, 249, 250, 0.84);
+    -webkit-backdrop-filter: saturate(1.5) blur(16px);
+    backdrop-filter: saturate(1.5) blur(16px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s var(--ease);
+  }
+
+  :global(html.is-scrolled) .header {
+    border-bottom-color: var(--line);
+  }
+
+  .bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: min(100% - var(--gutter) * 2, calc(var(--max) - 144px));
+    height: 64px;
+    margin-inline: auto;
+  }
+
+  .left,
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .name {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    margin-right: 6px;
+    font-size: 15.5px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    transition: color 0.2s var(--ease);
+  }
+
+  .name:hover {
+    color: var(--blue);
+  }
+
+  .icon-btn {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    color: var(--ink-soft);
+    transition:
+      background-color 0.2s var(--ease),
+      color 0.2s var(--ease),
+      transform 0.3s var(--spring);
+  }
+
+  .icon-btn:hover {
+    background: var(--surface-3);
+    color: var(--ink);
+    transform: scale(1.06);
+  }
+
+  .grid-btn[aria-pressed='true'] {
+    background: var(--blue-soft);
+    color: var(--blue);
+  }
+
+  .icon-btn[aria-current] {
+    color: var(--blue);
+  }
+
+  /* Island */
+  .island {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 44px;
+    padding: 0 11px 0 7px;
+    border-radius: 999px;
+    background: #0a0a0a;
+    color: #fff;
+    box-shadow: 0 6px 20px -8px rgba(0, 0, 0, 0.5);
+  }
+
+  .island-mark {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #fff;
+    color: #0a0a0a;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1;
+  }
+
+  .island-text {
+    display: grid;
+    min-width: 132px;
+    max-width: 230px;
+    line-height: 1.2;
+  }
+
+  .island-label {
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .island-sub {
+    overflow: hidden;
+    font-size: 11.5px;
+    color: #9aa0a6;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .island-ring {
+    flex: none;
+  }
+
+  .island-ring circle {
+    transition: stroke-dashoffset 0.2s linear;
+  }
+
+  /* Links */
+  .link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 12px;
+    border-radius: 999px;
+    font-size: 14.5px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    transition:
+      color 0.2s var(--ease),
+      background-color 0.2s var(--ease);
+  }
+
+  .link:hover {
+    color: var(--ink);
+    background: var(--surface-3);
+  }
+
+  .link[aria-current] {
+    color: var(--ink);
+  }
+
+  .link[aria-current]::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 3px;
+    width: 4px;
+    height: 4px;
+    margin-left: -2px;
+    border-radius: 50%;
+    background: var(--ink);
+  }
+
+  .motion {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 38px;
+    margin-left: 6px;
+    padding: 0 14px 0 11px;
+    border-radius: 999px;
+    background: var(--blue-soft);
+    color: var(--blue-ink);
+    font-size: 13.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition:
+      background-color 0.2s var(--ease),
+      transform 0.3s var(--spring);
+  }
+
+  .motion:hover {
+    background: #c2d7fb;
+    transform: translateY(-1px);
+  }
+
+  .motion-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--blue);
+    animation: pulse 1.8s var(--ease) infinite;
+  }
+
+  .motion[aria-pressed='false'] {
+    background: var(--surface-3);
+    color: var(--ink-soft);
+  }
+
+  .motion[aria-pressed='false'] .motion-dot {
+    background: var(--ink-faint);
+    animation: none;
+  }
+
+  @keyframes pulse {
+    50% {
+      transform: scale(1.5);
+      opacity: 0.45;
+    }
+  }
+
+  @media (max-width: 1080px) {
+    .island-text {
+      display: none;
+    }
+
+    .island {
+      padding-right: 7px;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .island,
+    .grid-btn,
+    .link:nth-of-type(n + 3) {
+      display: none;
+    }
+
+    .motion span[data-motion-label] {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+    }
+
+    .motion {
+      width: 38px;
+      padding: 0;
+      justify-content: center;
+    }
+  }
+
+  @media print {
+    .header {
+      display: none;
+    }
+  }
+</style>

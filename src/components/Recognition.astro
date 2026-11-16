@@ -1,0 +1,250 @@
+---
+import Icon from './Icon.astro';
+import { recognition } from '../data/site';
+
+const iconFor = (type: string) => (type === 'Award' ? 'award' : 'check');
+---
+
+<section id="recognition" class="section" data-section="recognition" aria-labelledby="recognition-title">
+  <div class="wrap layout" data-deck-scope>
+    <div class="copy" data-reveal>
+      <h2 id="recognition-title" class="h-mono">{recognition.heading}</h2>
+      <p class="lede">{recognition.subtitle}</p>
+
+      <div class="controls">
+        <button type="button" class="arrow" data-prev aria-label="Previous card">
+          <Icon name="chevron-left" size={18} />
+        </button>
+        <button type="button" class="arrow" data-next aria-label="Next card">
+          <Icon name="chevron-right" size={18} />
+        </button>
+        <span class="count" data-count aria-live="polite">1 / {recognition.items.length}</span>
+      </div>
+    </div>
+
+    <ul class="deck" data-deck data-reveal>
+      {
+        recognition.items.map((item) => (
+          <li class="rcard" data-card>
+            <div class="badge">
+              <Icon name={iconFor(item.type)} size={34} />
+              <span>{item.type}</span>
+            </div>
+            <div class="body">
+              <h3>{item.title}</h3>
+              <p class="issuer">
+                {item.issuer}
+                {item.date && <span> · {item.date}</span>}
+              </p>
+              {item.note && <p class="note">{item.note}</p>}
+              {item.url && (
+                <a class="pill pill--sm" href={item.url} target="_blank" rel="noopener">
+                  See credential <Icon name="arrow-up-right" size={14} />
+                  <span class="sr-only">for {item.title} (opens in a new tab)</span>
+                </a>
+              )}
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  /* The fanned cards may reach past the content column; never past the screen. */
+  #recognition {
+    overflow-x: clip;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
+    align-items: center;
+    gap: clamp(40px, 8vw, 120px);
+  }
+
+  .copy {
+    max-width: 460px;
+  }
+
+  .copy .h-mono {
+    font-size: clamp(30px, 4.4vw, 44px);
+  }
+
+  .controls {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    margin-top: 28px;
+  }
+
+  :global(.js) .controls {
+    display: flex;
+  }
+
+  .arrow {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: 1px solid var(--line-strong);
+    transition:
+      background-color 0.2s var(--ease),
+      color 0.2s var(--ease),
+      border-color 0.2s var(--ease),
+      transform 0.2s var(--ease);
+  }
+
+  .arrow:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .arrow:active {
+    transform: scale(0.94);
+  }
+
+  .count {
+    margin-left: 8px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--dim);
+  }
+
+  /* Without JavaScript the cards are a simple list. */
+  .deck {
+    display: grid;
+    gap: 12px;
+  }
+
+  .rcard {
+    display: flex;
+    flex-direction: column;
+    border-radius: 18px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    overflow: hidden;
+  }
+
+  .badge {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 20px 22px;
+    color: var(--accent);
+    background:
+      radial-gradient(ellipse 80% 120% at 0% 0%, rgba(var(--accent-rgb), 0.3), transparent 65%),
+      radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.14) 1px, transparent 1.5px) 0 0 / 16px 16px,
+      #0c1511;
+  }
+
+  .badge span {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .body {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 20px 22px 24px;
+  }
+
+  .rcard h3 {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: 0;
+    text-wrap: balance;
+  }
+
+  .issuer {
+    font-size: 13.5px;
+    color: var(--dim);
+  }
+
+  .note {
+    margin-top: 6px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  .body .pill {
+    margin-top: 12px;
+  }
+
+  /* With JavaScript the cards stack into a deck; click or use the arrows to cycle. */
+  .deck:global(.is-deck) {
+    --fan-x: 20px;
+    --fan-r: 4deg;
+    position: relative;
+    display: block;
+    height: 330px;
+    margin-right: 64px;
+    cursor: pointer;
+  }
+
+  /* Cards deeper than the fourth sit under it, so the fan never grows wider. */
+  .deck:global(.is-deck) .rcard {
+    --depth: min(var(--pos, 0), 3);
+    position: absolute;
+    inset: 0;
+    transform-origin: 50% 110%;
+    transform: translateX(calc(var(--depth) * var(--fan-x))) rotate(calc(var(--depth) * var(--fan-r)))
+      scale(calc(1 - var(--depth) * 0.04));
+    z-index: calc(10 - var(--pos, 0));
+    box-shadow: 0 30px 60px -24px rgba(0, 0, 0, 0.95);
+    transition:
+      transform 0.65s var(--ease-out),
+      opacity 0.45s var(--ease),
+      border-color 0.3s var(--ease);
+  }
+
+  .deck:global(.is-deck) .rcard :global(.badge) {
+    min-height: 118px;
+  }
+
+  .deck:global(.is-deck) .rcard:not(:global(.is-top)) > * {
+    opacity: 0.35;
+    transition: opacity 0.45s var(--ease);
+  }
+
+  .deck:global(.is-deck) .rcard:global(.is-top) {
+    border-color: rgba(var(--accent-rgb), 0.35);
+  }
+
+  .deck:global(.is-deck) .rcard:global(.is-buried) {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .deck:global(.is-deck):hover .rcard:global(.is-top) {
+    transform: translateY(-6px);
+  }
+
+  @media (max-width: 900px) {
+    .layout {
+      grid-template-columns: 1fr;
+    }
+
+    .deck:global(.is-deck) {
+      max-width: 400px;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .deck:global(.is-deck) {
+      --fan-x: 8px;
+      --fan-r: 2deg;
+      margin-right: 44px;
+    }
+  }
+</style>

@@ -1,0 +1,446 @@
+/* ------------------------------------------------------------------
+   Design tokens. Change the accent here and the whole site follows.
+   ------------------------------------------------------------------ */
+:root {
+  --bg: #000;
+  --surface: #1a1c1d;
+  --surface-2: #222527;
+  --surface-3: #2c3033;
+  --footer: #101213;
+  --line: rgba(255, 255, 255, 0.09);
+  --line-strong: rgba(255, 255, 255, 0.2);
+
+  --text: #f7f7f7;
+  --muted: rgba(255, 255, 255, 0.74);
+  --dim: #a3a9ad;
+
+  --accent: #3ddc97;
+  --accent-rgb: 61, 220, 151;
+  --accent-ink: #03170e;
+  --accent-soft: rgba(var(--accent-rgb), 0.12);
+
+  --font-sans: 'Mona Sans Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --radius-sm: 8px;
+  --radius: 14px;
+  --radius-lg: 22px;
+
+  --wrap: 1120px;
+  --gutter: clamp(20px, 5vw, 48px);
+  --section: clamp(104px, 15vw, 190px);
+
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  color-scheme: dark;
+}
+
+/* ------------------------------------------------------------------
+   Base
+   ------------------------------------------------------------------ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+  overflow-x: clip;
+  scroll-padding-top: 104px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* The mobile nav is two rows tall, so anchored sections need more room above. */
+@media (max-width: 640px) {
+  html {
+    scroll-padding-top: 148px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+  @view-transition {
+    navigation: auto;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+ul,
+ol,
+figure,
+blockquote {
+  margin: 0;
+}
+
+ul,
+ol {
+  padding: 0;
+  list-style: none;
+}
+
+img,
+picture,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ------------------------------------------------------------------
+   Layout helpers
+   ------------------------------------------------------------------ */
+.wrap {
+  width: min(100% - var(--gutter) * 2, var(--wrap));
+  margin-inline: auto;
+}
+
+.section {
+  padding-block: var(--section) 0;
+  position: relative;
+}
+
+.section-head {
+  text-align: center;
+  max-width: 760px;
+  margin-inline: auto;
+}
+
+.h-mono {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: clamp(32px, 5.4vw, 52px);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.lede {
+  margin-top: 14px;
+  color: var(--text);
+  text-wrap: pretty;
+}
+
+.fineprint {
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 100;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+  transform: translateY(-200%);
+  transition: transform 0.2s var(--ease);
+}
+
+.skip:focus-visible {
+  transform: none;
+  outline-color: #fff;
+}
+
+/* ------------------------------------------------------------------
+   Pills (buttons and button-like links)
+   ------------------------------------------------------------------ */
+.pill {
+  --pill-bg: transparent;
+  --pill-fg: var(--text);
+  --pill-bd: rgba(255, 255, 255, 0.75);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 22px;
+  border-radius: 999px;
+  border: 1px solid var(--pill-bd);
+  background: var(--pill-bg);
+  color: var(--pill-fg);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  transition:
+    background-color 0.25s var(--ease),
+    color 0.25s var(--ease),
+    border-color 0.25s var(--ease),
+    transform 0.25s var(--ease),
+    box-shadow 0.25s var(--ease);
+}
+
+.pill svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  transition: transform 0.25s var(--ease);
+}
+
+.pill:hover {
+  --pill-bg: #fff;
+  --pill-fg: #000;
+  --pill-bd: #fff;
+  transform: translateY(-2px);
+}
+
+.pill:hover svg {
+  transform: translate(2px, -2px);
+}
+
+.pill:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.pill--accent {
+  --pill-bg: var(--accent);
+  --pill-fg: var(--accent-ink);
+  --pill-bd: var(--accent);
+  font-weight: 600;
+}
+
+.pill--accent:hover {
+  --pill-bg: #62ecb0;
+  --pill-fg: var(--accent-ink);
+  --pill-bd: #62ecb0;
+  box-shadow: 0 10px 36px -8px rgba(var(--accent-rgb), 0.55);
+}
+
+.pill--sm {
+  min-height: 36px;
+  padding: 0 14px;
+  font-size: 13px;
+  --pill-bd: var(--line-strong);
+  --pill-bg: rgba(255, 255, 255, 0.06);
+}
+
+/* Underlined text link with an arrow that nudges on hover. */
+.more {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.45);
+  text-underline-offset: 4px;
+  transition:
+    color 0.25s var(--ease),
+    text-decoration-color 0.25s var(--ease);
+}
+
+.more svg {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.25s var(--ease);
+}
+
+/* Standalone text links get a comfortable tap height. */
+a.more {
+  min-height: 32px;
+}
+
+a.more:hover,
+.card:hover .more,
+.next:hover .more {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+}
+
+a.more:hover svg,
+.card:hover .more svg,
+.next:hover .more svg {
+  transform: translate(3px, -3px);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  font-size: 13px;
+  color: var(--text);
+  transition:
+    border-color 0.2s var(--ease),
+    background-color 0.2s var(--ease);
+}
+
+.chip:hover {
+  border-color: rgba(var(--accent-rgb), 0.7);
+  background: var(--accent-soft);
+}
+
+/* ------------------------------------------------------------------
+   Motion
+   Content is only hidden when the script is confirmed to be running
+   (html.js). Without JavaScript everything is simply visible.
+   ------------------------------------------------------------------ */
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.8s var(--ease-out),
+    transform 0.8s var(--ease-out);
+  transition-delay: calc(var(--d, 0) * 90ms);
+}
+
+.js [data-reveal].in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Word-by-word brightening, driven by --p (0 to 1) set on scroll. */
+.words .w {
+  transition: opacity 0.3s linear;
+}
+
+.js .words .w {
+  /* The floor of 0.5 keeps not-yet-lit words above 4.5:1 contrast on black. */
+  opacity: clamp(0.5, calc(var(--p, 0) * (var(--n) + 8) - var(--i)), 1);
+}
+
+.words strong {
+  font-weight: 700;
+}
+
+/* Scroll progress bar pinned to the bottom of the viewport. */
+.progress {
+  position: fixed;
+  inset: auto 0 0 0;
+  height: 3px;
+  z-index: 60;
+  pointer-events: none;
+}
+
+.progress span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transform-origin: 0 50%;
+  transform: scaleX(var(--scroll, 0));
+}
+
+/* Dev-only reminder boxes (never rendered in the built site). */
+.needs-input {
+  margin-block: 20px;
+  padding: 12px 16px;
+  border: 1px dashed #ffb224;
+  border-radius: 10px;
+  background: rgba(255, 178, 36, 0.08);
+  color: #ffd27a;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.5;
+  letter-spacing: 0;
+  text-align: left;
+}
+
+.needs-input strong {
+  color: #ffb224;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .js [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+
+  .js .words .w {
+    opacity: 1;
+  }
+}
+
+@media print {
+  .progress,
+  .skip {
+    display: none !important;
+  }
+}

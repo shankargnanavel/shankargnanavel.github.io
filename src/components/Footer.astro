@@ -1,0 +1,129 @@
+---
+import Icon from './Icon.astro';
+import Mark from './Mark.astro';
+import { footer, site } from '../data/site';
+
+const year = new Date().getFullYear();
+const first = site.name.split(' ')[0];
+---
+
+<footer class="footer">
+  <div class="wrap top">
+    <div class="about">
+      <Mark size={34} />
+      <p>{footer.credit}</p>
+      <p>© {year} {site.name}. All rights reserved.</p>
+    </div>
+    <ul class="links">
+      <li><a href={`mailto:${site.email}`}><Icon name="mail" size={16} />Email</a></li>
+      <li>
+        <a href={site.linkedin} target="_blank" rel="noopener"
+          ><Icon name="linkedin" size={16} />LinkedIn<span class="sr-only"> (opens in a new tab)</span></a
+        >
+      </li>
+      <li><a href="/resume/"><Icon name="file" size={16} />Resume</a></li>
+      <li><a href="#main"><Icon name="arrow-up-right" size={16} />Back to top</a></li>
+    </ul>
+  </div>
+  <p class="wordmark" aria-hidden="true">{first}</p>
+</footer>
+
+<style>
+  .footer {
+    margin-top: var(--section);
+    padding-top: clamp(48px, 7vw, 80px);
+    background: var(--footer);
+    border-top: 1px solid var(--line);
+    overflow: hidden;
+  }
+
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .about {
+    display: grid;
+    gap: 4px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--dim);
+  }
+
+  .about :global(svg) {
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 22px;
+    font-size: 14px;
+  }
+
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    color: var(--muted);
+    transition: color 0.2s var(--ease);
+  }
+
+  .links a :global(svg) {
+    transition: transform 0.25s var(--ease);
+  }
+
+  .links a:hover {
+    color: var(--accent);
+  }
+
+  .links a:hover :global(svg) {
+    transform: translateY(-2px);
+  }
+
+  /* Outlined wordmark that fills with the accent on hover. */
+  .wordmark {
+    margin-top: clamp(40px, 6vw, 72px);
+    margin-bottom: -0.16em;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: min(13.4vw, 196px);
+    line-height: 1;
+    letter-spacing: -0.06em;
+    text-align: center;
+    white-space: nowrap;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.2);
+    background-image: linear-gradient(90deg, var(--accent), #b9ffe1 55%, var(--accent));
+    background-repeat: no-repeat;
+    background-size: 0% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    transition:
+      background-size 1.1s var(--ease-out),
+      -webkit-text-stroke-color 0.6s var(--ease);
+    user-select: none;
+  }
+
+  .footer:hover .wordmark {
+    background-size: 100% 100%;
+    -webkit-text-stroke-color: transparent;
+  }
+
+  @media (max-width: 640px) {
+    .top {
+      flex-direction: column;
+    }
+  }
+
+  @media print {
+    .footer {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,720 @@
+---
+import '@fontsource-variable/playfair-display/wght.css';
+import '@fontsource-variable/playfair-display/wght-italic.css';
+import { Image } from 'astro:assets';
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Connect from '../../components/Connect.astro';
+// The case-study building blocks are shared with Design 1.
+import Columns from '../../../src/components/Columns.astro';
+import Figure from '../../../src/components/Figure.astro';
+import Icon from '../../../src/components/Icon.astro';
+import NeedsInput from '../../../src/components/NeedsInput.astro';
+import Stats from '../../../src/components/Stats.astro';
+import { caseStudies, type Project } from '../../../src/data/projects';
+import { site } from '../../../src/data/site';
+import { findImage } from '../../../src/lib/images';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('work');
+  return caseStudies.flatMap((project, index) => {
+    const entry = entries.find((item) => item.id === project.slug);
+    if (!entry) return [];
+    return [
+      {
+        params: { slug: project.slug },
+        props: { project, entry, next: caseStudies[(index + 1) % caseStudies.length] },
+      },
+    ];
+  });
+}
+
+interface Props {
+  project: Project;
+  entry: Awaited<ReturnType<typeof getCollection<'work'>>>[number];
+  next: Project;
+}
+
+const { project, entry, next } = Astro.props;
+const { Content, headings } = await render(entry);
+const sections = headings.filter((heading) => heading.depth === 2);
+const cover = findImage(project.cover);
+---
+
+<Base title={`${project.headline} | ${site.name}`} description={project.summary} back>
+  <article class="case" style={`--tint:${project.tint ?? '#9398ff'}`}>
+    <div class="glow" aria-hidden="true"></div>
+
+    <header class="wide hero">
+      <div class="copy">
+        <p class="tag"><span aria-hidden="true">✦</span> {project.label}</p>
+        <h1>{project.headline}</h1>
+        <p class="summary">{project.summary}</p>
+
+        <dl class="meta">
+          {
+            project.meta.map((item) => (
+              <div>
+                <dt>{item.label}</dt>
+                <dd>{item.value}</dd>
+              </div>
+            ))
+          }
+        </dl>
+
+        <p class="jump">
+          <span class="jump-label">TL;DR</span>
+          <a class="btn" href="#tldr">
+            Read the 30-second version <span class="down" aria-hidden="true">↓</span>
+          </a>
+        </p>
+      </div>
+
+      <div class="cover" style={`view-transition-name: cover-${project.slug}`}>
+        {
+          cover ? (
+            <Image
+              src={cover}
+              alt={project.coverAlt}
+              width={Math.min(cover.width, 1200)}
+              widths={[480, 800, 1200].filter((w) => w <= cover.width)}
+              sizes="(min-width: 980px) 520px, 92vw"
+              format="webp"
+              quality={82}
+              loading="eager"
+              fetchpriority="high"
+            />
+          ) : (
+            <div class="plate" aria-hidden="true">
+              <span>{project.name}</span>
+            </div>
+          )
+        }
+      </div>
+    </header>
+
+    {
+      !cover && (
+        <div class="wide">
+          <NeedsInput note={`No cover image yet. Add src/assets/work/${project.slug}/cover.png and set "cover" in src/data/projects.ts.`} />
+        </div>
+      )
+    }
+
+    <section id="tldr" class="wide tldr" aria-labelledby="tldr-title">
+      <h2 id="tldr-title" class="kicker">In 30 seconds</h2>
+      <div class="tldr-grid">
+        <div>
+          <h3>Problem</h3>
+          <p>{project.tldr.problem}</p>
+        </div>
+        <div>
+          <h3>My role</h3>
+          <p>{project.tldr.role}</p>
+        </div>
+        <div class="outcome">
+          <h3>Outcome</h3>
+          <p>{project.tldr.outcome}</p>
+        </div>
+      </div>
+      {
+        project.links && (
+          <p class="links">
+            {project.links.map((link) => (
+              <a class="btn" href={link.href} target="_blank" rel="noopener">
+                {link.label} <span class="arrow" aria-hidden="true">→</span>
+                <span class="sr-only">(opens in a new tab)</span>
+              </a>
+            ))}
+          </p>
+        )
+      }
+    </section>
+
+    <div class="wide body">
+      {
+        sections.length > 1 && (
+          <nav class="toc" data-toc aria-label="In this case study">
+            <p class="toc-title">In this case study</p>
+            <ol>
+              {sections.map((section, i) => (
+                <li>
+                  <a href={`#${section.slug}`}>
+                    <span class="toc-num" aria-hidden="true">
+                      {i + 1}
+                    </span>
+                    {section.text}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )
+      }
+
+      <div class="prose">
+        <Content components={{ Figure, Stats, Columns, NeedsInput }} />
+      </div>
+    </div>
+
+    <section class="wide" aria-label="Next project">
+      <a class="next" href={`/work/${next.slug}/`}>
+        <span class="kicker">Next project</span>
+        <span class="next-name">{next.name}</span>
+        <span class="next-desc">{next.card}</span>
+        <span class="go">view case study <span class="arrow" aria-hidden="true">→</span></span>
+      </a>
+    </section>
+  </article>
+
+  <Connect />
+
+  <dialog id="lightbox" aria-label="Enlarged image">
+    <button type="button" class="lb-close" data-close aria-label="Close enlarged image">
+      <Icon name="x" size={20} />
+    </button>
+    <figure>
+      <img alt="" />
+      <figcaption data-caption></figcaption>
+    </figure>
+  </dialog>
+</Base>
+
+<style>
+  .case {
+    position: relative;
+    isolation: isolate;
+  }
+
+  /* Each project tints the top of its page. */
+  .glow {
+    position: absolute;
+    inset: -56px 0 auto 0;
+    height: 880px;
+    z-index: -1;
+    background:
+      radial-gradient(ellipse 60% 70% at 78% 8%, color-mix(in srgb, var(--tint) 26%, transparent), transparent 70%),
+      radial-gradient(ellipse 50% 50% at 10% 0%, color-mix(in srgb, var(--tint) 12%, transparent), transparent 70%);
+    pointer-events: none;
+  }
+
+  :global(html[data-mode='paper']) .glow {
+    opacity: 0.55;
+  }
+
+  .wide {
+    width: min(100% - var(--gutter) * 2, 1120px);
+    margin-inline: auto;
+  }
+
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(32px, 6vw, 72px);
+    padding-top: clamp(40px, 7vw, 84px);
+  }
+
+  @media (min-width: 980px) {
+    .hero {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    }
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 9px;
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--tint) 18%, transparent);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  h1 {
+    margin-top: 18px;
+    font-family: var(--font-serif);
+    font-size: clamp(40px, 5.6vw, 66px);
+    font-weight: 600;
+    line-height: 1.04;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  .summary {
+    max-width: 46ch;
+    margin-top: 22px;
+    font-size: clamp(16px, 1.6vw, 18.5px);
+    line-height: 1.55;
+    color: var(--ink-soft);
+    text-wrap: pretty;
+  }
+
+  /* Facts in a ruled two-column grid. */
+  .meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 30px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .meta > div {
+    padding: 15px 16px 15px 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .meta > div:nth-child(even) {
+    padding-left: 18px;
+    border-left: 1px solid var(--line);
+  }
+
+  .meta > div:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  dt {
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  dd {
+    margin-top: 5px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .jump {
+    display: grid;
+    justify-items: start;
+    gap: 10px;
+    margin-top: 26px;
+  }
+
+  .jump-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+  }
+
+  .down {
+    display: inline-block;
+    transition: transform 0.25s var(--ease);
+  }
+
+  .btn:hover .down {
+    transform: translateY(3px);
+  }
+
+  .cover {
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--line);
+    overflow: hidden;
+    box-shadow: 0 40px 80px -40px color-mix(in srgb, var(--tint) 60%, #000);
+    rotate: 1.2deg;
+    transition: rotate 0.6s var(--ease-out);
+  }
+
+  .cover:hover {
+    rotate: 0deg;
+  }
+
+  .cover :global(img) {
+    width: 100%;
+  }
+
+  .plate {
+    display: grid;
+    align-content: end;
+    aspect-ratio: 4 / 3;
+    padding: 8%;
+    color: #f4f4f8;
+    font-family: var(--font-serif);
+    font-size: clamp(34px, 5vw, 58px);
+    font-weight: 600;
+    line-height: 1;
+    background:
+      radial-gradient(ellipse 80% 90% at 80% 0%, color-mix(in srgb, var(--tint) 50%, transparent), transparent 70%),
+      radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.13) 1px, transparent 1.5px) 0 0 / 20px 20px,
+      #0b0b0f;
+  }
+
+  /* In 30 seconds */
+  .tldr {
+    margin-top: clamp(56px, 8vw, 96px);
+    scroll-margin-top: 84px;
+  }
+
+  .tldr-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .tldr-grid > div {
+    padding: 22px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .tldr-grid h3 {
+    font-size: 14.5px;
+    font-weight: 600;
+  }
+
+  .tldr-grid p {
+    margin-top: 8px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+  }
+
+  .tldr-grid .outcome {
+    border-color: rgba(var(--accent-rgb), 0.4);
+    background: var(--accent-soft);
+  }
+
+  .outcome h3 {
+    color: var(--accent);
+  }
+
+  .outcome p {
+    color: var(--ink);
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  /* Body: numbered index on the left, content on the right. */
+  .body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 56px;
+    margin-top: clamp(56px, 8vw, 104px);
+  }
+
+  .toc {
+    display: none;
+  }
+
+  @media (min-width: 1040px) {
+    .body {
+      grid-template-columns: 210px minmax(0, 780px);
+    }
+
+    .toc {
+      display: block;
+      position: sticky;
+      top: 88px;
+      align-self: start;
+      max-height: calc(100vh - 120px);
+      overflow: auto;
+    }
+  }
+
+  .toc-title {
+    margin-bottom: 12px;
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  .toc a {
+    display: flex;
+    gap: 12px;
+    padding: 7px 0 7px 12px;
+    border-left: 2px solid transparent;
+    font-size: 12.8px;
+    line-height: 1.4;
+    color: var(--ink-faint);
+    transition:
+      color 0.2s var(--ease),
+      border-color 0.2s var(--ease),
+      background-color 0.2s var(--ease);
+  }
+
+  .toc-num {
+    flex: none;
+    width: 14px;
+    font-size: 11px;
+    opacity: 0.8;
+  }
+
+  .toc a:hover {
+    color: var(--ink);
+  }
+
+  .toc a:global(.is-current) {
+    border-left-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  /* Next project */
+  .next {
+    display: grid;
+    justify-items: start;
+    gap: 6px;
+    margin-top: clamp(64px, 9vw, 110px);
+    padding: clamp(22px, 3.2vw, 34px);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--line);
+    background: var(--surface);
+    transition:
+      transform 0.45s var(--ease-out),
+      border-color 0.3s var(--ease),
+      box-shadow 0.45s var(--ease-out);
+  }
+
+  .next:hover {
+    transform: translateY(-4px);
+    border-color: rgba(var(--accent-rgb), 0.65);
+    box-shadow: 0 26px 50px -30px rgba(var(--accent-rgb), 0.55);
+  }
+
+  .next .kicker {
+    margin: 0;
+  }
+
+  .next-name {
+    font-family: var(--font-serif);
+    font-size: clamp(28px, 3.8vw, 40px);
+    font-weight: 600;
+    line-height: 1.1;
+  }
+
+  .next-desc {
+    max-width: 62ch;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+  }
+
+  .go {
+    margin-top: 6px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  @media (max-width: 760px) {
+    .tldr-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Lightbox */
+  #lightbox {
+    width: 100vw;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: clamp(16px, 4vw, 48px);
+    border: 0;
+    background: rgba(8, 8, 11, 0.94);
+    color: #f4f4f8;
+    overflow: auto;
+    cursor: zoom-out;
+  }
+
+  #lightbox[open] {
+    display: grid;
+    place-items: center;
+    animation: lb-in 0.3s var(--ease-out);
+  }
+
+  @keyframes lb-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  #lightbox figure {
+    display: grid;
+    gap: 12px;
+    justify-items: center;
+  }
+
+  #lightbox img {
+    max-width: min(100%, 1800px);
+    max-height: calc(100dvh - 140px);
+    border-radius: 10px;
+  }
+
+  #lightbox figcaption {
+    font-size: 13px;
+    color: #bfc0cc;
+    text-align: center;
+  }
+
+  .lb-close {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(26, 26, 33, 0.9);
+    color: #f4f4f8;
+    transition:
+      background-color 0.2s var(--ease),
+      color 0.2s var(--ease),
+      transform 0.2s var(--ease);
+  }
+
+  .lb-close:hover {
+    background: #9398ff;
+    color: #121216;
+    transform: rotate(90deg);
+  }
+</style>
+
+<style is:global>
+  /* Typography for case-study bodies (the shared .mdx files) in Design 2. */
+  .prose {
+    counter-reset: section;
+    min-width: 0;
+  }
+
+  .prose > :where(p, ul, ol, blockquote, h2, h3, h4) {
+    max-width: 680px;
+  }
+
+  .prose h2 {
+    counter-increment: section;
+    margin: clamp(60px, 8vw, 96px) 0 18px;
+    font-family: var(--font-serif);
+    font-size: clamp(28px, 3.6vw, 38px);
+    font-weight: 600;
+    line-height: 1.12;
+    scroll-margin-top: 90px;
+    text-wrap: balance;
+  }
+
+  .prose h2::before {
+    content: counter(section, decimal-leading-zero);
+    display: block;
+    margin-bottom: 10px;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+  }
+
+  .prose > h2:first-child {
+    margin-top: 0;
+  }
+
+  .prose h3 {
+    margin: 32px 0 10px;
+    font-size: 17.5px;
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -0.005em;
+  }
+
+  .prose p {
+    margin-block: 14px;
+    font-size: 15.5px;
+    line-height: 1.75;
+    color: var(--ink-soft);
+    text-wrap: pretty;
+  }
+
+  .prose strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .prose :where(ul, ol):not([class]) {
+    display: grid;
+    gap: 9px;
+    margin-block: 14px;
+  }
+
+  .prose :where(ul, ol):not([class]) > li {
+    position: relative;
+    padding-left: 24px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+  }
+
+  .prose ul:not([class]) > li::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 0.66em;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .prose ol:not([class]) {
+    counter-reset: item;
+  }
+
+  .prose ol:not([class]) > li {
+    counter-increment: item;
+    padding-left: 30px;
+  }
+
+  .prose ol:not([class]) > li::before {
+    content: counter(item) '.';
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .prose blockquote {
+    margin-block: 26px;
+    padding: 2px 0 2px 22px;
+    border-left: 3px solid var(--accent);
+  }
+
+  .prose blockquote p {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(20px, 2.4vw, 25px);
+    line-height: 1.4;
+    color: var(--ink);
+  }
+
+  .prose code {
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: var(--surface-3);
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 0.88em;
+  }
+
+  .prose a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+</style>

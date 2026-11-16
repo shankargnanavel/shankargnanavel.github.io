@@ -1,0 +1,162 @@
+---
+import { Image } from 'astro:assets';
+import { intro, site } from '../../src/data/site';
+import { firstImage } from '../../src/lib/images';
+
+// A cut-out portrait. Make one from a photo on a white background with: node scripts/cutout-portrait.mjs
+const portrait = firstImage('profile/portrait-cutout.png', 'profile/portrait.png');
+---
+
+<section id="top" class="hero" aria-labelledby="hero-name">
+  <div class="grid" aria-hidden="true"></div>
+
+  <div class="col">
+    {
+      portrait && (
+        <div class="portrait">
+          <Image
+            src={portrait}
+            alt={`Portrait of ${site.name}`}
+            width={400}
+            widths={[200, 400]}
+            sizes="188px"
+            format="webp"
+            loading="eager"
+            fetchpriority="high"
+          />
+        </div>
+      )
+    }
+
+    <h1 id="hero-name">{site.name}</h1>
+    <div class="sub">
+      <p class="role">{site.role}</p>
+      <p class="place">{site.location}</p>
+    </div>
+
+    <div class="intro">
+      {
+        intro.map((paragraph) => (
+          <p>
+            {paragraph.map((part) =>
+              part.br ? <br /> : part.mark ? <strong class="mark">{part.text}</strong> : part.text,
+            )}
+          </p>
+        ))
+      }
+    </div>
+
+    <div class="actions">
+      {
+        site.resumePdf && (
+          <a class="btn btn-fill" href={site.resumePdf} target="_blank" rel="noopener">
+            Resume<span class="sr-only"> (PDF, opens in a new tab)</span>
+          </a>
+        )
+      }
+      <button type="button" class="btn" data-copy={site.email} aria-live="polite">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="9" y="9" width="11" height="11" rx="2.5"></rect>
+          <path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15"></path>
+        </svg>
+        <span data-copy-label>Copy Email</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    isolation: isolate;
+    padding-top: clamp(40px, 7vw, 76px);
+  }
+
+  /* Faint grid behind the portrait, fading out towards the text. */
+  .grid {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 420px;
+    z-index: -1;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 38px 38px;
+    background-position: 50% 0;
+    -webkit-mask-image: radial-gradient(ellipse 62% 78% at 50% 30%, #000 20%, transparent 78%);
+    mask-image: radial-gradient(ellipse 62% 78% at 50% 30%, #000 20%, transparent 78%);
+  }
+
+  .portrait {
+    width: 188px;
+    margin: 0 0 22px -6px;
+    -webkit-mask-image: linear-gradient(#000 78%, transparent 100%);
+    mask-image: linear-gradient(#000 78%, transparent 100%);
+    animation: rise 0.9s var(--ease-out) both;
+  }
+
+  .col > :not(.portrait) {
+    animation: rise 0.9s var(--ease-out) both;
+  }
+
+  .col > h1 {
+    animation-delay: 0.08s;
+  }
+  .col > .sub {
+    animation-delay: 0.14s;
+  }
+  .col > .intro {
+    animation-delay: 0.2s;
+  }
+  .col > .actions {
+    animation-delay: 0.26s;
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  .sub {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 2px 16px;
+    margin-top: 6px;
+    color: var(--ink-soft);
+  }
+
+  .role {
+    font-size: 17.5px;
+  }
+
+  .place {
+    font-size: 14px;
+  }
+
+  .intro {
+    display: grid;
+    gap: 14px;
+    margin-top: 22px;
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: var(--ink);
+    text-wrap: pretty;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 26px;
+  }
+</style>

@@ -1,0 +1,18 @@
+---
+/** The "G" monogram used in the nav, footer and favicon. */
+interface Props {
+  size?: number;
+}
+const { size = 26 } = Astro.props;
+---
+
+<svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true">
+  <rect width="64" height="64" rx="16" fill="rgba(255,255,255,0.1)"></rect>
+  <path
+    d="M42.7 23A14 14 0 1 0 46 32H34"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="6"
+    stroke-linecap="round"
+    stroke-linejoin="round"></path>
+</svg>

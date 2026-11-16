@@ -1,0 +1,50 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "all-designs",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "scripts/preview-all.mjs"
+      ],
+      "port": 4321
+    },
+    {
+      "name": "portfolio",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "astro",
+        "dev",
+        "--port",
+        "4321"
+      ],
+      "port": 4321
+    },
+    {
+      "name": "portfolio-dark",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "DESIGN=1",
+        "npx",
+        "astro",
+        "dev",
+        "--port",
+        "4322"
+      ],
+      "port": 4322
+    },
+    {
+      "name": "portfolio-paper",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "DESIGN=2",
+        "npx",
+        "astro",
+        "dev",
+        "--port",
+        "4323"
+      ],
+      "port": 4323
+    }
+  ]
+}

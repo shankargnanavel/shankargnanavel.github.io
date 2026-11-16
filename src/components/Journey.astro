@@ -1,0 +1,213 @@
+---
+import Icon from './Icon.astro';
+import RevealText from './RevealText.astro';
+import { education, journey, skills, tools } from '../data/site';
+
+// Tilt and offset for each fanned card, repeated if there are more cards than values.
+const tilt = [-6, 3, -2, 5, -4, 2];
+const drop = [18, 0, 26, 6, 22, 10];
+---
+
+<section id="journey" class="section" data-section="journey" aria-labelledby="journey-title">
+  <div class="wrap">
+    <div class="section-head" data-reveal>
+      <h2 id="journey-title" class="h-mono">{journey.heading}</h2>
+    </div>
+    <RevealText segments={journey.intro} class="intro" />
+
+    <ol class="fan">
+      {
+        journey.cards.map((card, i) => (
+          <li
+            class="jcard"
+            data-reveal
+            style={`--r:${tilt[i % tilt.length]}deg; --y:${drop[i % drop.length]}px; --d:${i}`}
+          >
+            <div class="top">
+              <span class="company">{card.company}</span>
+              <span class="dates">{card.dates}</span>
+            </div>
+            <h3>{card.role}</h3>
+            <p>{card.story}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="toolkit" data-reveal>
+      <div>
+        <h3 class="eyebrow">Skills</h3>
+        <ul class="chips">
+          {skills.map((skill) => <li class="chip">{skill}</li>)}
+        </ul>
+      </div>
+      <div>
+        <h3 class="eyebrow">Tools</h3>
+        <ul class="chips">
+          {tools.map((tool) => <li class="chip">{tool}</li>)}
+        </ul>
+      </div>
+      <div>
+        <h3 class="eyebrow">Education</h3>
+        <p class="degree">{education.degree}</p>
+        <p class="school">{education.school} · {education.dates}</p>
+        <a class="more" href="/resume/">Read the full resume <Icon name="arrow-up-right" size={14} /></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .wrap :global(.intro) {
+    max-width: 44em;
+    margin: 16px auto 0;
+    text-align: center;
+    text-wrap: pretty;
+  }
+
+  /* Fanned cards: tilted and overlapping on wide screens, a plain grid below. */
+  .fan {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: clamp(36px, 5vw, 56px);
+  }
+
+  .jcard {
+    position: relative;
+    padding: 20px;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    background: var(--surface);
+    transition:
+      rotate 0.55s var(--ease-out),
+      translate 0.55s var(--ease-out),
+      scale 0.55s var(--ease-out),
+      background-color 0.3s var(--ease),
+      box-shadow 0.55s var(--ease-out),
+      opacity 0.8s var(--ease-out),
+      transform 0.8s var(--ease-out);
+  }
+
+  .top {
+    display: grid;
+    gap: 2px;
+    margin-bottom: 14px;
+  }
+
+  .company {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    transition: color 0.3s var(--ease);
+  }
+
+  .dates {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0;
+    color: var(--dim);
+    white-space: nowrap;
+  }
+
+  .jcard h3 {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: 0;
+  }
+
+  .jcard p {
+    margin-top: 8px;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  .jcard:hover {
+    background: var(--surface-2);
+    box-shadow:
+      0 0 0 1px rgba(var(--accent-rgb), 0.45),
+      0 36px 70px -34px rgba(var(--accent-rgb), 0.45);
+  }
+
+  .jcard:hover .company {
+    color: var(--accent);
+  }
+
+  @media (min-width: 1080px) {
+    .fan {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      padding-block: 26px 44px;
+    }
+
+    .jcard {
+      flex: 0 0 236px;
+      margin-left: -16px;
+      padding-right: 28px;
+      rotate: var(--r);
+      translate: 0 var(--y);
+      box-shadow: 0 26px 50px -22px rgba(0, 0, 0, 0.9);
+    }
+
+    .jcard:first-child {
+      margin-left: 0;
+    }
+
+    .jcard:hover {
+      z-index: 5;
+      rotate: 0deg;
+      translate: 0 -12px;
+      scale: 1.05;
+    }
+
+    .fan:has(.jcard:hover) .jcard:not(:hover) {
+      opacity: 0.55;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .fan {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Skills, tools and education */
+  .toolkit {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr 1fr;
+    gap: clamp(24px, 4vw, 48px);
+    margin-top: clamp(28px, 4vw, 48px);
+    padding: clamp(22px, 3.4vw, 36px);
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01));
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .degree {
+    margin-top: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .school {
+    margin: 4px 0 16px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  @media (max-width: 900px) {
+    .toolkit {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

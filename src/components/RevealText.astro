@@ -1,0 +1,51 @@
+---
+/**
+ * A paragraph whose words brighten one by one as it scrolls into view.
+ * Pass segments; `strong: true` keeps that phrase bold.
+ */
+interface Segment {
+  text: string;
+  strong?: boolean;
+}
+interface Props {
+  segments: Segment[];
+  class?: string;
+}
+
+const { segments, class: className } = Astro.props;
+
+let index = 0;
+const parts = segments.map((segment) => ({
+  strong: !!segment.strong,
+  words: segment.text
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word) => ({ word, i: index++ })),
+}));
+---
+
+<p class:list={['words', className]} style={`--n:${index}`}>
+  {
+    parts.map((part) =>
+      part.strong ? (
+        <strong>
+          {part.words.map(({ word, i }) => (
+            <>
+              <span class="w" style={`--i:${i}`}>
+                {word}
+              </span>{' '}
+            </>
+          ))}
+        </strong>
+      ) : (
+        part.words.map(({ word, i }) => (
+          <>
+            <span class="w" style={`--i:${i}`}>
+              {word}
+            </span>{' '}
+          </>
+        ))
+      ),
+    )
+  }
+</p>

@@ -1,0 +1,185 @@
+---
+import { footer, site, spec } from '../../src/data/site';
+
+const year = new Date().getFullYear();
+// The wordmark sets the name in two halves: bold sans, then italic serif.
+const [first, rest] = spec.wordmark;
+---
+
+<footer class="footer">
+  <div class="wrap">
+    <p class="wordmark" aria-hidden="true">
+      {first}<span class="serif">{rest}</span>
+    </p>
+
+    <p class="now">
+      <span class="chip chip-now">Now</span>
+      {spec.contact.now}
+    </p>
+
+    <dl class="colophon">
+      <div>
+        <dt>Type</dt>
+        <dd>Inter for reading. Libre Baskerville italic for emphasis. JetBrains Mono for labels and measurements.</dd>
+      </div>
+      <div>
+        <dt>Colour</dt>
+        <dd>
+          <span class="swatches" aria-hidden="true">
+            <i style="background:#0b57d0"></i><i style="background:#fde293"></i><i style="background:#ceead6"></i><i
+              style="background:#d93025"></i><i style="background:#1f1f1f"></i>
+          </span>
+          Blue for action, yellow for emphasis, green for now, red for measurement.
+        </dd>
+      </div>
+      <div>
+        <dt>Motion</dt>
+        <dd class="mono-list">
+          standard (.2, 0, 0, 1)<br />decelerate (.05, .7, .1, 1)<br />spring (.34, 1.56, .64, 1)
+        </dd>
+      </div>
+      <div>
+        <dt>Made with</dt>
+        <dd>{footer.credit} The grid button up top shows the layout.</dd>
+      </div>
+    </dl>
+
+    <div class="end">
+      <span>© {year} {site.name}</span>
+      <a href="#main">Back to top <span class="up" aria-hidden="true">↑</span></a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    padding-block: clamp(56px, 8vw, 96px) 36px;
+  }
+
+  .wordmark {
+    font-size: clamp(52px, 13.2vw, 184px);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.055em;
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  .wordmark .serif {
+    color: var(--blue);
+    letter-spacing: -0.04em;
+    transition: color 0.4s var(--ease);
+  }
+
+  .wordmark:hover .serif {
+    color: var(--ink);
+  }
+
+  .now {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-top: clamp(20px, 3vw, 36px);
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--line);
+    font-size: 15px;
+    color: var(--ink-soft);
+  }
+
+  .colophon {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 28px 32px;
+    padding-block: 28px 36px;
+  }
+
+  dt {
+    margin-bottom: 10px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  dd {
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+  }
+
+  .mono-list {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.75;
+  }
+
+  .swatches {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .swatches i {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s var(--spring);
+  }
+
+  .swatches i:hover {
+    transform: scale(1.35);
+  }
+
+  .end {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 24px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--ink-faint);
+  }
+
+  .end a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 32px;
+    transition: color 0.2s var(--ease);
+  }
+
+  .end a:hover {
+    color: var(--blue);
+  }
+
+  .up {
+    display: inline-block;
+    transition: transform 0.3s var(--spring);
+  }
+
+  .end a:hover .up {
+    transform: translateY(-4px);
+  }
+
+  @media (max-width: 860px) {
+    .colophon {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 480px) {
+    .colophon {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media print {
+    .footer {
+      display: none;
+    }
+  }
+</style>

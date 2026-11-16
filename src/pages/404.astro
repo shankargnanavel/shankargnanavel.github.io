@@ -1,0 +1,56 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+---
+
+<Base title={`Page not found | ${site.name}`} description="This page does not exist.">
+  <section class="wrap lost">
+    <p class="code" aria-hidden="true">404</p>
+    <h1 class="h-mono">This page took a wrong turn</h1>
+    <p class="lede">The link is broken or the page has moved. The work is still where it was.</p>
+    <p class="actions">
+      <a class="pill pill--accent" href="/#work">See my work <Icon name="arrow-right" size={16} /></a>
+      <a class="pill" href="/">Back to home</a>
+    </p>
+  </section>
+</Base>
+
+<style>
+  .lost {
+    min-height: 82svh;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    padding-top: 150px;
+    text-align: center;
+  }
+
+  .code {
+    font-family: var(--font-mono);
+    font-size: clamp(88px, 22vw, 220px);
+    font-weight: 700;
+    line-height: 0.9;
+    letter-spacing: -0.07em;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--accent);
+  }
+
+  h1 {
+    margin-top: 18px;
+    font-size: clamp(26px, 4vw, 40px);
+  }
+
+  .lede {
+    max-width: 42ch;
+    color: var(--muted);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 28px;
+  }
+</style>

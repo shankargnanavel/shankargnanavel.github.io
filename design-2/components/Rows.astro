@@ -1,0 +1,134 @@
+---
+/**
+ * A ruled list: badge, name, then one or more lines with a date on the right.
+ * Used for experience, education and recognition.
+ */
+import Icon from '../../src/components/Icon.astro';
+
+export interface Row {
+  /** Two or three letters shown in the badge, or an icon name ('award' | 'check'). */
+  badge: string;
+  name: string;
+  note?: string;
+  lines: { text: string; meta?: string }[];
+}
+
+interface Props {
+  rows: Row[];
+}
+
+const { rows } = Astro.props;
+const icons = ['award', 'check'];
+---
+
+<ul class="rows">
+  {
+    rows.map((row) => (
+      <li class="row" data-reveal>
+        <span class="badge" aria-hidden="true">
+          {icons.includes(row.badge) ? <Icon name={row.badge as 'award' | 'check'} size={18} /> : row.badge}
+        </span>
+        <div class="name">
+          <h3>{row.name}</h3>
+          {row.note && <p class="note">{row.note}</p>}
+        </div>
+        <ul class="lines">
+          {row.lines.map((line) => (
+            <li>
+              <span>{line.text}</span>
+              {line.meta && <span class="meta">{line.meta}</span>}
+            </li>
+          ))}
+        </ul>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .row {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 0.8fr) minmax(0, 1.25fr);
+    align-items: start;
+    gap: 16px;
+    padding-block: 21px;
+    border-bottom: 1px solid var(--line);
+    transition:
+      opacity 0.7s var(--ease-out),
+      transform 0.7s var(--ease-out);
+  }
+
+  .badge {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    transition:
+      border-color 0.25s var(--ease),
+      background-color 0.25s var(--ease),
+      transform 0.35s var(--ease-out);
+  }
+
+  .row:hover .badge {
+    border-color: rgba(var(--accent-rgb), 0.6);
+    background: var(--accent-soft);
+    transform: rotate(-4deg) scale(1.04);
+  }
+
+  .name {
+    align-self: center;
+  }
+
+  h3 {
+    font-size: 13.6px;
+    font-weight: 600;
+    line-height: 1.5;
+    letter-spacing: -0.005em;
+  }
+
+  .note {
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+
+  .lines {
+    display: grid;
+    gap: 12px;
+    align-self: center;
+  }
+
+  .lines li {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 12.8px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+
+  .meta {
+    flex: none;
+    font-size: 11.5px;
+    color: var(--ink-faint);
+    white-space: nowrap;
+  }
+
+  @media (max-width: 600px) {
+    .row {
+      grid-template-columns: 40px minmax(0, 1fr);
+      row-gap: 12px;
+    }
+
+    .lines {
+      grid-column: 2;
+    }
+  }
+</style>
