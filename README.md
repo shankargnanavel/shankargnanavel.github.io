@@ -2,6 +2,9 @@
 
 A static site built with [Astro](https://astro.build). It holds **three designs that share one set of content**, so you can compare them and publish any one.
 
+- **Live site:** https://shankargnanavel.github.io (Design 3)
+- **Code:** https://github.com/shankargnanavel/shankargnanavel.github.io (public)
+
 | | Design 3: Spec sheet (current) | Design 2: Pixel and Paper | Design 1: Dark |
 | --- | --- | --- | --- |
 | Look | Light surface, Inter with serif-italic emphasis and mono labels, coloured flip cards, a layout-grid overlay | One narrow column, Manrope, periwinkle accent, dark "Pixel" and light "Paper" themes | Black page, fanned cards, mint accent |
@@ -53,7 +56,7 @@ Amber boxes marked **[NEEDS INPUT]** show where content is still missing. They a
 
 ## Choose which design is published
 
-Open `astro.config.mjs` and change the default in this line to `'1'`, `'2'` or `'3'`:
+Open `astro.config.mjs` and change the default in this line to `'1'`, `'2'` or `'3'`, then publish (see below):
 
 ```js
 const design = process.env.DESIGN ?? '3';
@@ -69,7 +72,7 @@ All three designs read the same files, so you edit once.
 | Project cards, headline numbers, tags and "In 30 seconds" summaries | `src/data/projects.ts` |
 | The body of a case study | `src/content/work/<project>.mdx` |
 | Images | `src/assets/` (resized and compressed automatically) |
-| The resume PDF | Replace `public/Gowrishankar-G-Resume-2026.pdf` (or change `resumePdf` in `site.ts`) |
+| The resume PDF | Off for now (see "Still needs your input") |
 | Colours and spacing | The first block of `design-3/styles/global.css`, `design-2/styles/global.css` or `src/styles/global.css` |
 
 `site.ts` is grouped by design: shared facts at the top, then a block for each design's own wording (`spec` is Design 3).
@@ -114,7 +117,7 @@ node scripts/cutout-portrait.mjs
 Search the project for `NEEDS INPUT` to find each one.
 
 - **Naming SBI:** the site names SBI and YONO Business, as your resume does. Reword the hero text, the YONO card and the impact tile if that should be more general.
-- **Domain:** set `url` in `src/data/site.ts` and `site` in `astro.config.mjs` once you have one, so link previews use full addresses.
+- **Resume download:** switched off because the PDF shows your phone number. The file is kept in `private/`, which is never published. To switch it on, put a PDF without the number in `public/` and set `resumePdf` in `src/data/site.ts` to its name, for example `'/Gowrishankar-G-Resume.pdf'`.
 - **YONO Business:** it is an "in progress" card with no case study or visuals.
 - **WELNS visuals:** the case study has only a cover image.
 - **MioSalon landing page:** add before/after numbers for the results if you have them.
@@ -122,40 +125,39 @@ Search the project for `NEEDS INPUT` to find each one.
 - **FAQ (Design 1):** four answers are empty and hidden.
 - **Credential links:** paste each certificate's link into `recognition.items` in `src/data/site.ts`.
 
-## Deploy to Vercel
+## Publish a change
 
-1. Create a free account at https://github.com and a new empty repository (no README).
-2. In this folder, run these one at a time, replacing the address with your repository's:
+The site is hosted free on GitHub Pages. Every push to GitHub rebuilds and republishes it in about a minute.
 
-   ```bash
-   git init
-   ```
+1. Make your edits and check them with `npm run dev`.
+2. Run these one at a time in this folder, with your own short note in the second one:
 
    ```bash
    git add -A
    ```
 
    ```bash
-   git commit -m "Portfolio site"
+   git commit -m "Update case study text"
    ```
 
    ```bash
-   git branch -M main
+   git push
    ```
 
-   ```bash
-   git remote add origin https://github.com/YOUR-USERNAME/YOUR-REPO.git
-   ```
+3. Follow the build at https://github.com/shankargnanavel/shankargnanavel.github.io/actions. A green tick means the change is live.
 
-   ```bash
-   git push -u origin main
-   ```
+If a build fails, the live site stays as it was. Open the failed run on that page to see why.
 
-3. Go to https://vercel.com/new, sign in with GitHub and import the repository. Vercel detects Astro; leave every setting as it is and press **Deploy**.
-4. After about a minute you get a live address ending in `.vercel.app`.
-5. To use your own domain, open the project in Vercel, go to **Settings → Domains**, add the domain and follow the DNS steps shown. Then fill in the domain in the two places listed above.
+### Use your own domain later
 
-From then on, every `git push` publishes the change.
+1. Buy a domain from any registrar.
+2. In the repository on GitHub, open **Settings → Pages**, enter the domain under **Custom domain** and follow the DNS steps it shows.
+3. Change the address in `site` in `astro.config.mjs` and `url` in `src/data/site.ts`, then publish.
+
+### Good to know
+
+- **The repository is public.** Anyone can read the code and content. The `private/` folder and anything listed in `.gitignore` are never uploaded.
+- **Commits use a private email.** They are signed `206697173+shankargnanavel@users.noreply.github.com`, so your real email is not in the history.
 
 ## Useful commands
 
@@ -165,7 +167,7 @@ From then on, every `git push` publishes the change.
 | `npm run dev` | Live preview of the published design (Design 3) |
 | `npm run dev:paper` | Live preview of Design 2 on port 4323 (one live preview at a time) |
 | `npm run dev:dark` | Live preview of Design 1 on port 4322 (one live preview at a time) |
-| `npm run build` | Build the published design into `dist/` |
+| `npm run build` | Build the published design into `dist/` (GitHub does this for you on every push) |
 | `npm run build:paper`, `npm run build:dark` | Build Design 2 or Design 1 into `dist/` |
 | `node scripts/make-og.mjs` | Regenerate the link-preview images |
 | `node scripts/cutout-portrait.mjs` | Regenerate the portrait cut-out |
